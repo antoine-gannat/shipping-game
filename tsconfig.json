@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "module": "ES2022",
+    "target": "ES2022",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
+}
