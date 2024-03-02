@@ -10,6 +10,7 @@ const useStyles = createUseStyles({
     height: "100%",
     zIndex: 10,
     backgroundColor: "transparent",
+    userSelect: "none",
   },
 });
 

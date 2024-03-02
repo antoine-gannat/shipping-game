@@ -21,6 +21,7 @@ class Game {
     window.addEventListener("mouseup", this.onMouseUp.bind(this));
     window.addEventListener("mousemove", this.onMouseMove.bind(this));
     window.addEventListener("wheel", this.onWheel.bind(this));
+    window.addEventListener("mouseout", this.onMouseUp.bind(this));
 
     map.forEach((elements, row) => {
       elements.forEach((element, column) => {
@@ -42,6 +43,7 @@ class Game {
     window.removeEventListener("mouseup", this.onMouseUp.bind(this));
     window.removeEventListener("mousemove", this.onMouseMove.bind(this));
     window.removeEventListener("wheel", this.onWheel.bind(this));
+    window.removeEventListener("mouseout", this.onMouseUp.bind(this));
   }
 
   private mapPositionToScreenPosition({ x, y }: IPosition): IPosition {
@@ -80,7 +82,6 @@ class Game {
       app.stage.position.y -= deltaY;
     }
 
-    console.log(app.stage.position);
     this.lastClick = { x: event.clientX, y: event.clientY };
   }
 
