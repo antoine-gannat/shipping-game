@@ -1,15 +1,20 @@
-import { Graphics } from "pixi.js";
 import { app } from "../Pixi";
+import { Cell } from "./components/Cell";
+import { CELL_SIZE } from "./constants";
 
 class Game {
   constructor() {
     window.addEventListener("keydown", this.onKeyDown.bind(this));
-    let frame = new Graphics();
-    frame.beginFill(0x666666);
-    frame.lineStyle({ color: 0xffffff, width: 4, alignment: 0 });
-    frame.drawRect(0, 0, 208, 208);
-    frame.position.set(320 - 104, 180 - 104);
-    app.stage.addChild(frame);
+    app.stage.addChild(new Cell({ x: 200, y: 100 }, "#FF0000").element);
+    app.stage.addChild(
+      new Cell(
+        {
+          x: 200 + CELL_SIZE * 0.88,
+          y: 100 + CELL_SIZE / 2 - CELL_SIZE * 0.05,
+        },
+        "#FF0000"
+      ).element
+    );
   }
 
   public destroy() {
