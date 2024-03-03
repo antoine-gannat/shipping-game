@@ -10,7 +10,7 @@ const map = [
   [0, 0, 1, 1, 1, 1, 0],
   [0, 0, 1, 1, 1, 1, 0],
   [0, 0, 0, 0, 1, 1, 0],
-  [0, 0, 0, 0, 0, 0, 0],
+  [0, 1, 0, 0, 0, 0, 0],
 ];
 
 class Game {
@@ -49,7 +49,7 @@ class Game {
   private mapPositionToScreenPosition({ x, y }: IPosition): IPosition {
     return {
       x: (x - y) * (CELL_SIZE * 0.88) + y,
-      y: (y + x) * (CELL_SIZE / 2 - CELL_SIZE * 0.05) + y * 8,
+      y: (y * 0.955 + x * 0.9) * (CELL_SIZE / 2),
     };
   }
 

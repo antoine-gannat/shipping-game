@@ -15,7 +15,17 @@ export class Cell {
     topSide.beginFill(color);
     topSide.drawRect(0, 0, CELL_SIZE, CELL_SIZE);
     topSide.endFill();
-    topSide.setTransform(0, 0 + CELL_SIZE * 0.5, 1, 1, 0, 1.1, -0.5, 0, 0);
+    topSide.setTransform(
+      /* x */ 0,
+      /* y */ 0 + CELL_SIZE * 0.5,
+      /* scaleX */ 1,
+      /* scaley */ 1,
+      /* rotation */ 0,
+      /* skewX */ 1.1,
+      /* skewY */ -0.5,
+      /* pivotX */ 0,
+      /* pivotY */ 0
+    );
 
     var leftSide = new Graphics();
 
