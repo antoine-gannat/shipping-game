@@ -1,10 +1,11 @@
+import { Sprite } from "pixi.js";
 import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
 
 const map = [
-  [0, 0, 1, 1, 1, 1, 1],
+  [0, 0, 1, 1, 1, 0, 2],
   [0, 0, 1, 1, 0, 0, 0],
   [0, 1, 1, 1, 0, 0, 0],
   [0, 0, 1, 1, 1, 1, 0],
@@ -28,12 +29,26 @@ class Game {
         if (element === 0) {
           return;
         }
-        app.stage.addChild(
-          new Cell(
-            this.mapPositionToScreenPosition({ x: column, y: row }),
-            "#FFFFFF"
-          ).element
-        );
+        const position = this.mapPositionToScreenPosition({
+          x: column,
+          y: row,
+        });
+        app.stage.addChild(new Cell(position, "#FFFFFF").element);
+        let assetName;
+        switch (element) {
+          case 2:
+            assetName = "building1";
+            break;
+        }
+        if (assetName) {
+          const sprite = Sprite.from(`/assets/${assetName}.png`);
+          sprite.scale.set(0.5);
+          sprite.position.set(
+            position.x + CELL_SIZE / 5,
+            position.y - CELL_SIZE / 1.3
+          );
+          app.stage.addChild(sprite);
+        }
       });
     });
   }
