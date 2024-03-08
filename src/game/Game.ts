@@ -3,20 +3,20 @@ import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
-import { randomInteger } from "./utils/rand";
 
 const map = [
-  [0, 0, 1, 1, 1, 0, 2],
+  [1, 1, 1, 1, 1, 2, 2],
   [0, 0, 1, 1, 0, 0, 0],
   [0, 1, 1, 1, 0, 0, 0],
   [0, 0, 1, 1, 1, 1, 0],
   [0, 0, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 1, 1, 0],
+  [0, 2, 0, 0, 1, 1, 0],
   [0, 1, 0, 0, 0, 0, 0],
 ];
 
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
+  private hasMoved: boolean = false;
   constructor() {
     app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 5;
     window.addEventListener("mousedown", this.onMouseDown.bind(this));
@@ -24,10 +24,13 @@ class Game {
     window.addEventListener("mousemove", this.onMouseMove.bind(this));
     window.addEventListener("wheel", this.onWheel.bind(this));
     window.addEventListener("mouseout", this.onMouseUp.bind(this));
+    window.addEventListener("click", this.onClick.bind(this));
 
     this.drawWave(8, 4);
     this.drawWave(8, 5);
     this.drawWave(8, 6);
+
+    this.drawShip(9, 7);
 
     map.forEach((elements, row) => {
       elements.forEach((element, column) => {
@@ -64,30 +67,86 @@ class Game {
     window.removeEventListener("mousemove", this.onMouseMove.bind(this));
     window.removeEventListener("wheel", this.onWheel.bind(this));
     window.removeEventListener("mouseout", this.onMouseUp.bind(this));
+    window.removeEventListener("click", this.onClick.bind(this));
+  }
+
+  private createFramesForAnimation(
+    animationName: string,
+    frameSize: { width: number; height: number },
+    frameCount = 4,
+    frameStart = 0
+  ): PIXI.ISpritesheetData["frames"] {
+    const frames: PIXI.ISpritesheetData["frames"] = {};
+
+    for (let i = frameStart; i < frameCount; i++) {
+      frames[`${animationName}${i}`] = {
+        frame: {
+          x: i * frameSize.width,
+          y: 0,
+          w: frameSize.width,
+          h: frameSize.height,
+        },
+        sourceSize: { w: frameSize.width, h: frameSize.height },
+      };
+    }
+    return frames;
+  }
+
+  private async drawShip(x: number, y: number) {
+    const frames = this.createFramesForAnimation(
+      "ship-move",
+      {
+        width: 500,
+        height: 500,
+      },
+      4,
+      1
+    );
+
+    const atlasData = {
+      frames,
+      meta: {
+        image: "assets/cargo-ship.png",
+        format: "RGBA8888",
+        size: { w: CELL_SIZE, h: CELL_SIZE },
+        scale: 1,
+      },
+      animations: {
+        wave: Object.keys(frames), //array of frames by name
+      },
+    };
+
+    // Create the SpriteSheet from data and image
+    const spritesheet = new PIXI.Spritesheet(
+      PIXI.BaseTexture.from(atlasData.meta.image),
+      atlasData
+    );
+
+    // Generate all the Textures asynchronously
+    await spritesheet.parse();
+
+    // spritesheet is ready to use!
+    const anim = new PIXI.AnimatedSprite(spritesheet.animations.wave);
+
+    // set the animation speed
+    anim.animationSpeed = 0.05;
+    // play the animation on a loop
+    anim.play();
+
+    const pos = this.mapPositionToScreenPosition({ x, y });
+    anim.position.set(pos.x, pos.y);
+    // add it to the stage to render
+    app.stage.addChild(anim);
+
+    app.ticker.add(() => {
+      anim.x -= 1;
+      anim.y += 0.5;
+    });
   }
 
   private async drawWave(x: number, y: number) {
-    function createFramesForAnimation(
-      animationName: string,
-      frameSize: { width: number; height: number }
-    ): PIXI.ISpritesheetData["frames"] {
-      const frames: PIXI.ISpritesheetData["frames"] = {};
-
-      for (let i = 0; i < 4; i++) {
-        frames[`${animationName}${i}`] = {
-          frame: {
-            x: i * frameSize.width,
-            y: 0,
-            w: frameSize.width,
-            h: frameSize.height,
-          },
-          sourceSize: { w: frameSize.width, h: frameSize.height },
-        };
-      }
-      return frames;
-    }
     // Create object to store sprite sheet data
-    const frames = createFramesForAnimation("wave", {
+    const frames = this.createFramesForAnimation("wave", {
       width: 200,
       height: 200,
     });
@@ -119,14 +178,14 @@ class Game {
     // set the animation speed
     anim.animationSpeed = 0.02;
     // play the animation on a loop
-    anim.gotoAndPlay(randomInteger(0, 4));
+    anim.play();
 
     const pos = this.mapPositionToScreenPosition({ x, y });
     anim.setTransform(
       /* x */ pos.x,
       /* y */ pos.y,
-      /* scaleX */ 0.5,
-      /* scaley */ 0.5,
+      /* scaleX */ 0.5, // reduce from 200px to 100px
+      /* scaley */ 0.5, // reduce from 200px to 100px
       /* rotation */ 0,
       /* skewX */ 1.1,
       /* skewY */ -0.5,
@@ -144,7 +203,18 @@ class Game {
     };
   }
 
+  private onClick({ clientX, clientY }: MouseEvent) {
+    // if the click is related to a drag event, ignore it
+    if (this.hasMoved) {
+      return;
+    }
+    const cellX = Math.round((clientX - app.stage.position.x) / CELL_SIZE);
+    const cellY = Math.round((clientY - app.stage.position.y) / CELL_SIZE);
+    console.log(cellX, cellY);
+  }
+
   private onMouseDown(event: MouseEvent) {
+    this.hasMoved = false;
     this.lastClick = { x: event.clientX, y: event.clientY };
   }
 
@@ -157,6 +227,7 @@ class Game {
     if (this.lastClick.x === -1) {
       return;
     }
+    this.hasMoved = true;
 
     const deltaX = Math.abs(event.clientX - this.lastClick.x);
     const deltaY = Math.abs(event.clientY - this.lastClick.y);
