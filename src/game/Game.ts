@@ -5,11 +5,11 @@ import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
 
 const map = [
-  [1, 1, 1, 1, 1, 2, 2],
-  [0, 0, 1, 1, 0, 0, 0],
+  [0, 1, 1, 1, 1, 2, 2],
   [0, 1, 1, 1, 0, 0, 0],
-  [0, 0, 1, 1, 1, 1, 0],
-  [0, 0, 1, 1, 1, 1, 0],
+  [0, 1, 1, 1, 0, 0, 0],
+  [0, 1, 1, 1, 1, 2, 0],
+  [0, 1, 1, 1, 1, 3, 0],
   [0, 2, 0, 0, 1, 1, 0],
   [0, 1, 0, 0, 0, 0, 0],
 ];
@@ -55,6 +55,9 @@ class Game {
         switch (element) {
           case 2:
             assetName = "building1";
+            break;
+          case 3:
+            assetName = "containers";
             break;
         }
         if (assetName) {
@@ -252,6 +255,19 @@ class Game {
       app.stage.position.y += deltaY;
     } else if (event.clientY < this.lastClick.y) {
       app.stage.position.y -= deltaY;
+    }
+
+    if (app.stage.position.x < -app.stage.width) {
+      app.stage.position.x = -app.stage.width;
+    }
+    if (app.stage.position.y < -app.stage.height) {
+      app.stage.position.y = -app.stage.height;
+    }
+    if (app.stage.position.x > app.stage.width) {
+      app.stage.position.x = app.stage.width;
+    }
+    if (app.stage.position.y > app.stage.height) {
+      app.stage.position.y = app.stage.height;
     }
 
     this.lastClick = { x: event.clientX, y: event.clientY };
