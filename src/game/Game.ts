@@ -30,7 +30,16 @@ class Game {
     this.drawWave(8, 5);
     this.drawWave(8, 6);
 
-    this.drawShip(9, 7);
+    this.drawShip(3, 2, true).then((ship) => {
+      ship.gotoAndStop(0);
+    });
+
+    this.drawShip(9, 7).then((ship) => {
+      app.ticker.add(() => {
+        ship.x -= 1;
+        ship.y += 0.5;
+      });
+    });
 
     map.forEach((elements, row) => {
       elements.forEach((element, column) => {
@@ -92,7 +101,11 @@ class Game {
     return frames;
   }
 
-  private async drawShip(x: number, y: number) {
+  private async drawShip(
+    x: number,
+    y: number,
+    isStatic = false
+  ): Promise<PIXI.AnimatedSprite> {
     const frames = this.createFramesForAnimation(
       "ship-move",
       {
@@ -100,7 +113,7 @@ class Game {
         height: 500,
       },
       4,
-      1
+      isStatic ? 0 : 1
     );
 
     const atlasData = {
@@ -126,22 +139,19 @@ class Game {
     await spritesheet.parse();
 
     // spritesheet is ready to use!
-    const anim = new PIXI.AnimatedSprite(spritesheet.animations.wave);
+    const ship = new PIXI.AnimatedSprite(spritesheet.animations.wave);
 
     // set the animation speed
-    anim.animationSpeed = 0.05;
+    ship.animationSpeed = 0.05;
     // play the animation on a loop
-    anim.play();
+    ship.play();
 
     const pos = this.mapPositionToScreenPosition({ x, y });
-    anim.position.set(pos.x, pos.y);
+    ship.position.set(pos.x, pos.y);
     // add it to the stage to render
-    app.stage.addChild(anim);
+    app.stage.addChild(ship);
 
-    app.ticker.add(() => {
-      anim.x -= 1;
-      anim.y += 0.5;
-    });
+    return ship;
   }
 
   private async drawWave(x: number, y: number) {
