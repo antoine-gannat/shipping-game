@@ -1,7 +1,9 @@
 import { Container, Graphics } from "pixi.js";
 import { IPosition } from "../types";
-import { CELL_SIZE } from "../constants";
+import { CELL_SIZE, MAGIC_X_POSITION_MULTIPLIER } from "../constants";
 import { shadeColor } from "../utils/shadeColor";
+import { degToRad } from "../utils/degrees";
+import { cellPositionToScreenPosition } from "../utils/cellPosition";
 
 export class Cell {
   public element: Container;
@@ -9,49 +11,43 @@ export class Cell {
   constructor(position: IPosition, color: string) {
     this.element = new Container();
 
-    var topSide = new Graphics();
+    const topSide = new Graphics();
     const height = CELL_SIZE / 2;
+    const sidePosition = { x: 0, y: CELL_SIZE / 2 };
 
     topSide.beginFill(color);
     topSide.drawRect(0, 0, CELL_SIZE, CELL_SIZE);
     topSide.endFill();
-    topSide.setTransform(
-      /* x */ 0,
-      /* y */ 0 + CELL_SIZE * 0.5,
-      /* scaleX */ 1,
-      /* scaley */ 1,
-      /* rotation */ 0,
-      /* skewX */ 1.1,
-      /* skewY */ -0.5,
-      /* pivotX */ 0,
-      /* pivotY */ 0
-    );
+    topSide.position = sidePosition;
+    topSide.skew = {
+      x: degToRad(60 /* degrees */),
+      y: -degToRad(30 /* degrees */),
+    };
 
-    var leftSide = new Graphics();
+    const leftSide = new Graphics();
 
     leftSide.beginFill(shadeColor(color, -20));
     leftSide.drawRect(0, 0, height, CELL_SIZE);
     leftSide.endFill();
-    leftSide.setTransform(0, 0 + CELL_SIZE * 0.5, 1, 1, 0, 1.1, 1.57, 0, 0);
+    leftSide.position = sidePosition;
+    leftSide.skew = {
+      x: degToRad(60 /* degrees */),
+      y: degToRad(90 /* degrees */),
+    };
 
-    var rightSide = new Graphics();
+    const rightSide = new Graphics();
 
     rightSide.beginFill(shadeColor(color, -30));
     rightSide.drawRect(0, 0, CELL_SIZE, height);
     rightSide.endFill();
-    rightSide.setTransform(
-      0,
-      0 + CELL_SIZE * 0.5,
-      1,
-      1,
-      0,
-      -0.0,
-      -0.5,
-      -(CELL_SIZE + CELL_SIZE * 0.015),
-      -(CELL_SIZE - CELL_SIZE * 0.06)
-    );
+    rightSide.position = {
+      x: CELL_SIZE * MAGIC_X_POSITION_MULTIPLIER,
+      y: CELL_SIZE,
+    };
+    rightSide.skew = { x: 0, y: -degToRad(30 /* degrees */) };
 
-    this.element.position.set(position.x, position.y);
+    const { x, y } = cellPositionToScreenPosition(position);
+    this.element.position.set(x, y);
 
     this.element.addChild(leftSide);
     this.element.addChild(rightSide);

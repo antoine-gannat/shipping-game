@@ -3,6 +3,7 @@ import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
+import { cellPositionToScreenPosition } from "./utils/cellPosition";
 
 const map = [
   [0, 1, 1, 1, 1, 2, 2],
@@ -18,7 +19,7 @@ class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
   private hasMoved: boolean = false;
   constructor() {
-    app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 5;
+    app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 15;
     window.addEventListener("mousedown", this.onMouseDown.bind(this));
     window.addEventListener("mouseup", this.onMouseUp.bind(this));
     window.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -46,11 +47,18 @@ class Game {
         if (element === 0) {
           return;
         }
-        const position = this.mapPositionToScreenPosition({
+        const position = {
           x: column,
           y: row,
-        });
-        app.stage.addChild(new Cell(position, "#FFFFFF").element);
+        };
+        app.stage.addChild(
+          new Cell(
+            position,
+            `#${(row + column) % 9}${(row + column) % 9}${(row + column) % 9}${
+              (row + column) % 9
+            }${(row + column) % 9}${(row + column) % 9}`
+          ).element
+        );
         let assetName;
         switch (element) {
           case 2:
@@ -63,10 +71,8 @@ class Game {
         if (assetName) {
           const sprite = PIXI.Sprite.from(`/assets/${assetName}.png`);
           sprite.scale.set(0.5);
-          sprite.position.set(
-            position.x + CELL_SIZE / 5,
-            position.y - CELL_SIZE / 1.3
-          );
+          const { x, y } = cellPositionToScreenPosition(position);
+          sprite.position.set(x + CELL_SIZE / 2, y - CELL_SIZE);
           app.stage.addChild(sprite);
         }
       });
