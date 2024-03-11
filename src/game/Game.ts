@@ -5,14 +5,101 @@ import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 
+interface ICellInfo {
+  size: number;
+  asset: string | null;
+}
+
+enum CellType {
+  Sea,
+  Empty,
+  Building,
+  Containers,
+}
+
+const cellsInfo: Record<CellType, ICellInfo> = {
+  [CellType.Sea]: {
+    size: 100,
+    asset: null,
+  },
+  [CellType.Empty]: {
+    size: 100,
+    asset: null,
+  },
+  [CellType.Building]: {
+    size: 300,
+    asset: "building1",
+  },
+  [CellType.Containers]: {
+    size: 200,
+    asset: "containers",
+  },
+};
+
 const map = [
-  [0, 1, 1, 1, 1, 2, 2],
-  [0, 1, 1, 1, 0, 0, 0],
-  [0, 1, 1, 1, 0, 0, 0],
-  [0, 1, 1, 1, 1, 2, 0],
-  [0, 1, 1, 1, 1, 3, 0],
-  [0, 2, 0, 0, 1, 1, 0],
-  [0, 1, 0, 0, 0, 0, 0],
+  [
+    CellType.Sea,
+    CellType.Containers,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Building,
+    CellType.Building,
+  ],
+  [
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Sea,
+    CellType.Sea,
+    CellType.Sea,
+  ],
+  [
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Sea,
+    CellType.Sea,
+    CellType.Sea,
+  ],
+  [
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Sea,
+  ],
+  [
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Sea,
+  ],
+  [
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Sea,
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Empty,
+    CellType.Sea,
+  ],
+  [
+    CellType.Sea,
+    CellType.Empty,
+    CellType.Sea,
+    CellType.Sea,
+    CellType.Sea,
+    CellType.Sea,
+    CellType.Sea,
+  ],
 ];
 
 class Game {
@@ -31,7 +118,7 @@ class Game {
     this.drawWave(8, 5);
     this.drawWave(8, 6);
 
-    this.drawShip(3, 2, true).then((ship) => {
+    this.drawShip(3, 3, true).then((ship) => {
       ship.gotoAndStop(0);
     });
 
@@ -51,28 +138,15 @@ class Game {
           x: column,
           y: row,
         };
-        app.stage.addChild(
-          new Cell(
-            position,
-            `#${(row + column) % 9}${(row + column) % 9}${(row + column) % 9}${
-              (row + column) % 9
-            }${(row + column) % 9}${(row + column) % 9}`
-          ).element
-        );
-        let assetName;
-        switch (element) {
-          case 2:
-            assetName = "building1";
-            break;
-          case 3:
-            assetName = "containers";
-            break;
-        }
-        if (assetName) {
-          const sprite = PIXI.Sprite.from(`/assets/${assetName}.png`);
-          sprite.scale.set(0.5);
+        app.stage.addChild(new Cell(position, `#FFFFFF`).element);
+        const cell = cellsInfo[element];
+        if (cell.asset) {
+          const sprite = PIXI.Sprite.from(`/assets/${cell.asset}.png`);
+          const scaleDownAmount = CELL_SIZE / cell.size;
+          sprite.scale.set(scaleDownAmount);
+
           const { x, y } = cellPositionToScreenPosition(position);
-          sprite.position.set(x + CELL_SIZE / 2, y - CELL_SIZE);
+          sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
           app.stage.addChild(sprite);
         }
       });
@@ -155,8 +229,8 @@ class Game {
     // play the animation on a loop
     ship.play();
 
-    const pos = this.mapPositionToScreenPosition({ x, y });
-    ship.position.set(pos.x, pos.y);
+    const pos = cellPositionToScreenPosition({ x, y });
+    ship.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
     // add it to the stage to render
     app.stage.addChild(ship);
 
@@ -288,8 +362,8 @@ class Game {
       app.stage.scale.y += 0.1;
     }
     if (app.stage.scale.x > CAMERA_MAX_SCALE) {
-      app.stage.scale.x = CAMERA_MAX_SCALE;
-      app.stage.scale.y = CAMERA_MAX_SCALE;
+      // app.stage.scale.x = CAMERA_MAX_SCALE;
+      // app.stage.scale.y = CAMERA_MAX_SCALE;
     }
     if (app.stage.scale.x < CAMERA_MIN_SCALE) {
       app.stage.scale.x = CAMERA_MIN_SCALE;
