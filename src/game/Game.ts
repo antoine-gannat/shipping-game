@@ -5,6 +5,7 @@ import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
+import { callUIApi } from "../react/reactApi";
 
 interface ICellInfo {
   size: number;
@@ -96,8 +97,11 @@ class Game {
             sprite.eventMode = "static";
             addHoverStyling(sprite);
 
-            sprite.on("click", () => {
-              console.log("cell clicked");
+            sprite.on("click", (e) => {
+              callUIApi("show-building-info", {
+                buildingId: 1,
+                clickPosition: e.client,
+              });
             });
           }
           app.stage.addChild(sprite);
@@ -184,11 +188,13 @@ class Game {
     const pos = cellPositionToScreenPosition({ x, y });
     ship.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
-    ship.eventMode = "static";
-    addHoverStyling(ship);
-    ship.onclick = () => {
-      console.log("ship clicked");
-    };
+    if (isStatic) {
+      ship.eventMode = "static";
+      addHoverStyling(ship);
+      ship.on("click", (e) => {
+        callUIApi("show-ship-info", { shipId: 1, clickPosition: e.client });
+      });
+    }
     // add it to the stage to render
     app.stage.addChild(ship);
 
@@ -249,8 +255,8 @@ class Game {
       app.stage.scale.y += 0.1;
     }
     if (app.stage.scale.x > CAMERA_MAX_SCALE) {
-      // app.stage.scale.x = CAMERA_MAX_SCALE;
-      // app.stage.scale.y = CAMERA_MAX_SCALE;
+      app.stage.scale.x = CAMERA_MAX_SCALE;
+      app.stage.scale.y = CAMERA_MAX_SCALE;
     }
     if (app.stage.scale.x < CAMERA_MIN_SCALE) {
       app.stage.scale.x = CAMERA_MIN_SCALE;
