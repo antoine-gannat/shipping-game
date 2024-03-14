@@ -4,7 +4,7 @@ import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
-import { ColorOverlayFilter } from "@pixi/filter-color-overlay";
+import { addHoverStyling } from "./utils/addHoverStyling";
 
 interface ICellInfo {
   size: number;
@@ -94,13 +94,8 @@ class Game {
 
           if (cell.isInteractive) {
             sprite.eventMode = "static";
-            sprite.cursor = "pointer";
-            sprite.on("pointermove", () => {
-              sprite.filters = [new ColorOverlayFilter([1, 0.9, 0], 0.3)];
-            });
-            sprite.on("pointerleave", () => {
-              sprite.filters = [];
-            });
+            addHoverStyling(sprite);
+
             sprite.on("click", () => {
               console.log("cell clicked");
             });
@@ -190,7 +185,7 @@ class Game {
     ship.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
     ship.eventMode = "static";
-    ship.cursor = "pointer";
+    addHoverStyling(ship);
     ship.onclick = () => {
       console.log("ship clicked");
     };
