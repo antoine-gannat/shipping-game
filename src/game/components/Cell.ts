@@ -7,6 +7,12 @@ import { cellPositionToScreenPosition } from "../utils/cellPosition";
 
 export class Cell {
   public element: Container;
+  public bounds: {
+    top: IPosition;
+    left: IPosition;
+    right: IPosition;
+    bottom: IPosition;
+  };
 
   constructor(position: IPosition, color: string) {
     this.element = new Container();

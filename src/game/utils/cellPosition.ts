@@ -18,13 +18,11 @@ import { IPosition } from "../types";
  */
 
 export const cellPositionToScreenPosition = (
-  position: IPosition,
-  cellSize = CELL_SIZE,
-  cellHeight = CELL_HEIGHT
+  cellPosition: IPosition
 ): IPosition => {
   const x =
-    (cellSize * position.x - position.y * cellSize) *
+    (CELL_SIZE * cellPosition.x - cellPosition.y * CELL_SIZE) *
     MAGIC_X_POSITION_MULTIPLIER;
-  const y = cellHeight * position.x + position.y * cellHeight;
+  const y = CELL_HEIGHT * cellPosition.x + cellPosition.y * CELL_HEIGHT;
   return { x, y };
 };

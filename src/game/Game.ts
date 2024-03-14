@@ -4,10 +4,12 @@ import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { IPosition } from "./types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
+import { ColorOverlayFilter } from "@pixi/filter-color-overlay";
 
 interface ICellInfo {
   size: number;
   asset: string | null;
+  isInteractive: boolean;
 }
 
 enum CellType {
@@ -21,90 +23,37 @@ const cellsInfo: Record<CellType, ICellInfo> = {
   [CellType.Sea]: {
     size: 100,
     asset: null,
+    isInteractive: false,
   },
   [CellType.Empty]: {
     size: 100,
     asset: null,
+    isInteractive: false,
   },
   [CellType.Building]: {
     size: 300,
     asset: "building1",
+    isInteractive: true,
   },
   [CellType.Containers]: {
     size: 200,
     asset: "containers",
+    isInteractive: true,
   },
 };
 
 const map = [
-  [
-    CellType.Sea,
-    CellType.Containers,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Building,
-    CellType.Building,
-  ],
-  [
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Sea,
-    CellType.Sea,
-    CellType.Sea,
-  ],
-  [
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Sea,
-    CellType.Sea,
-    CellType.Sea,
-  ],
-  [
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Sea,
-  ],
-  [
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Sea,
-  ],
-  [
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Sea,
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Empty,
-    CellType.Sea,
-  ],
-  [
-    CellType.Sea,
-    CellType.Empty,
-    CellType.Sea,
-    CellType.Sea,
-    CellType.Sea,
-    CellType.Sea,
-    CellType.Sea,
-  ],
+  [1, 1, 1, 1, 1, 2, 2],
+  [0, 1, 1, 1, 0, 0, 0],
+  [0, 1, 1, 1, 0, 0, 0],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 1, 1, 1, 1, 3, 0],
+  [0, 1, 0, 0, 1, 3, 0],
+  [0, 1, 0, 0, 0, 0, 0],
 ];
 
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
-  private hasMoved: boolean = false;
   constructor() {
     app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 15;
     window.addEventListener("mousedown", this.onMouseDown.bind(this));
@@ -112,11 +61,6 @@ class Game {
     window.addEventListener("mousemove", this.onMouseMove.bind(this));
     window.addEventListener("wheel", this.onWheel.bind(this));
     window.addEventListener("mouseout", this.onMouseUp.bind(this));
-    window.addEventListener("click", this.onClick.bind(this));
-
-    this.drawWave(8, 4);
-    this.drawWave(8, 5);
-    this.drawWave(8, 6);
 
     this.drawShip(3, 3, true).then((ship) => {
       ship.gotoAndStop(0);
@@ -139,7 +83,7 @@ class Game {
           y: row,
         };
         app.stage.addChild(new Cell(position, `#FFFFFF`).element);
-        const cell = cellsInfo[element];
+        const cell = cellsInfo[element as CellType];
         if (cell.asset) {
           const sprite = PIXI.Sprite.from(`/assets/${cell.asset}.png`);
           const scaleDownAmount = CELL_SIZE / cell.size;
@@ -147,6 +91,20 @@ class Game {
 
           const { x, y } = cellPositionToScreenPosition(position);
           sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
+
+          if (cell.isInteractive) {
+            sprite.eventMode = "static";
+            sprite.cursor = "pointer";
+            sprite.on("pointermove", () => {
+              sprite.filters = [new ColorOverlayFilter([1, 0.9, 0], 0.3)];
+            });
+            sprite.on("pointerleave", () => {
+              sprite.filters = [];
+            });
+            sprite.on("click", () => {
+              console.log("cell clicked");
+            });
+          }
           app.stage.addChild(sprite);
         }
       });
@@ -159,7 +117,6 @@ class Game {
     window.removeEventListener("mousemove", this.onMouseMove.bind(this));
     window.removeEventListener("wheel", this.onWheel.bind(this));
     window.removeEventListener("mouseout", this.onMouseUp.bind(this));
-    window.removeEventListener("click", this.onClick.bind(this));
   }
 
   private createFramesForAnimation(
@@ -231,83 +188,19 @@ class Game {
 
     const pos = cellPositionToScreenPosition({ x, y });
     ship.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
+
+    ship.eventMode = "static";
+    ship.cursor = "pointer";
+    ship.onclick = () => {
+      console.log("ship clicked");
+    };
     // add it to the stage to render
     app.stage.addChild(ship);
 
     return ship;
   }
 
-  private async drawWave(x: number, y: number) {
-    // Create object to store sprite sheet data
-    const frames = this.createFramesForAnimation("wave", {
-      width: 200,
-      height: 200,
-    });
-    const atlasData = {
-      frames,
-      meta: {
-        image: "assets/wave-sprite.png",
-        format: "RGBA8888",
-        size: { w: CELL_SIZE, h: CELL_SIZE },
-        scale: 1,
-      },
-      animations: {
-        wave: Object.keys(frames), //array of frames by name
-      },
-    };
-
-    // Create the SpriteSheet from data and image
-    const spritesheet = new PIXI.Spritesheet(
-      PIXI.BaseTexture.from(atlasData.meta.image),
-      atlasData
-    );
-
-    // Generate all the Textures asynchronously
-    await spritesheet.parse();
-
-    // spritesheet is ready to use!
-    const anim = new PIXI.AnimatedSprite(spritesheet.animations.wave);
-
-    // set the animation speed
-    anim.animationSpeed = 0.02;
-    // play the animation on a loop
-    anim.play();
-
-    const pos = this.mapPositionToScreenPosition({ x, y });
-    anim.setTransform(
-      /* x */ pos.x,
-      /* y */ pos.y,
-      /* scaleX */ 0.5, // reduce from 200px to 100px
-      /* scaley */ 0.5, // reduce from 200px to 100px
-      /* rotation */ 0,
-      /* skewX */ 1.1,
-      /* skewY */ -0.5,
-      /* pivotX */ 0,
-      /* pivotY */ 0
-    );
-    // add it to the stage to render
-    app.stage.addChild(anim);
-  }
-
-  private mapPositionToScreenPosition({ x, y }: IPosition): IPosition {
-    return {
-      x: (x - y) * (CELL_SIZE * 0.88) + y,
-      y: (y * 0.955 + x * 0.9) * (CELL_SIZE / 2),
-    };
-  }
-
-  private onClick({ clientX, clientY }: MouseEvent) {
-    // if the click is related to a drag event, ignore it
-    if (this.hasMoved) {
-      return;
-    }
-    const cellX = Math.round((clientX - app.stage.position.x) / CELL_SIZE);
-    const cellY = Math.round((clientY - app.stage.position.y) / CELL_SIZE);
-    console.log(cellX, cellY);
-  }
-
   private onMouseDown(event: MouseEvent) {
-    this.hasMoved = false;
     this.lastClick = { x: event.clientX, y: event.clientY };
   }
 
@@ -320,7 +213,6 @@ class Game {
     if (this.lastClick.x === -1) {
       return;
     }
-    this.hasMoved = true;
 
     const deltaX = Math.abs(event.clientX - this.lastClick.x);
     const deltaY = Math.abs(event.clientY - this.lastClick.y);
