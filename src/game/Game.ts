@@ -2,22 +2,16 @@ import * as PIXI from "pixi.js";
 import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
-import { IPosition } from "../types";
+import { CellType, IPosition } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
 import { callUIApi } from "../react/reactApi";
+import { getStore } from "../store";
 
 interface ICellInfo {
   size: number;
   asset: string | null;
   isInteractive: boolean;
-}
-
-enum CellType {
-  Sea,
-  Empty,
-  Building,
-  Containers,
 }
 
 const cellsInfo: Record<CellType, ICellInfo> = {
@@ -43,69 +37,40 @@ const cellsInfo: Record<CellType, ICellInfo> = {
   },
 };
 
-const map = [
-  [1, 1, 1, 1, 1, 2, 2],
-  [0, 1, 1, 1, 0, 0, 0],
-  [0, 1, 1, 1, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 1, 1, 1, 1, 3, 0],
-  [0, 1, 0, 0, 1, 3, 0],
-  [0, 1, 0, 0, 0, 0, 0],
-];
-
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
   constructor() {
+    // set default scale
     app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 15;
+    // add event listeners for camera movement
     window.addEventListener("mousedown", this.onMouseDown.bind(this));
     window.addEventListener("mouseup", this.onMouseUp.bind(this));
     window.addEventListener("mousemove", this.onMouseMove.bind(this));
     window.addEventListener("wheel", this.onWheel.bind(this));
     window.addEventListener("mouseout", this.onMouseUp.bind(this));
 
-    this.drawShip(3, 3, true).then((ship) => {
-      ship.gotoAndStop(0);
-    });
+    const store = getStore();
 
-    this.drawShip(9, 7).then((ship) => {
-      app.ticker.add(() => {
-        ship.x -= 1;
-        ship.y += 0.5;
-      });
-    });
-
-    map.forEach((elements, row) => {
-      elements.forEach((element, column) => {
-        if (element === 0) {
-          return;
-        }
-        const position = {
-          x: column,
-          y: row,
-        };
-        app.stage.addChild(new Cell(position, `#FFFFFF`).element);
-        const cell = cellsInfo[element as CellType];
-        if (cell.asset) {
-          const sprite = PIXI.Sprite.from(`/assets/${cell.asset}.png`);
-          const scaleDownAmount = CELL_SIZE / cell.size;
-          sprite.scale.set(scaleDownAmount);
-
-          const { x, y } = cellPositionToScreenPosition(position);
-          sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
-
-          if (cell.isInteractive) {
-            sprite.eventMode = "static";
-            addHoverStyling(sprite);
-
-            sprite.on("click", (e) => {
-              callUIApi("show-building-info", {
-                buildingId: 1,
-                clickPosition: e.client,
-              });
+    // Draw ships
+    store.ships.forEach((ship) => {
+      this.drawShip(ship.position.x, ship.position.y, ship.static).then(
+        (sprite) => {
+          if (!ship.static) {
+            app.ticker.add(() => {
+              sprite.x -= 1;
+              sprite.y += 0.5;
             });
+          } else {
+            sprite.gotoAndStop(0);
           }
-          app.stage.addChild(sprite);
         }
+      );
+    });
+
+    // Draw map
+    store.map.forEach((elements, row) => {
+      elements.forEach((element, column) => {
+        this.drawMapElement(element as CellType, row, column);
       });
     });
   }
@@ -199,6 +164,39 @@ class Game {
     app.stage.addChild(ship);
 
     return ship;
+  }
+
+  private drawMapElement(kind: CellType, row: number, column: number) {
+    if (kind === CellType.Sea) {
+      return;
+    }
+    const position = {
+      x: column,
+      y: row,
+    };
+    app.stage.addChild(new Cell(position, `#FFFFFF`).element);
+    const cell = cellsInfo[kind as CellType];
+    if (cell.asset) {
+      const sprite = PIXI.Sprite.from(`/assets/${cell.asset}.png`);
+      const scaleDownAmount = CELL_SIZE / cell.size;
+      sprite.scale.set(scaleDownAmount);
+
+      const { x, y } = cellPositionToScreenPosition(position);
+      sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
+
+      if (cell.isInteractive) {
+        sprite.eventMode = "static";
+        addHoverStyling(sprite);
+
+        sprite.on("click", (e) => {
+          callUIApi("show-building-info", {
+            buildingId: 1,
+            clickPosition: e.client,
+          });
+        });
+      }
+      app.stage.addChild(sprite);
+    }
   }
 
   private onMouseDown(event: MouseEvent) {
