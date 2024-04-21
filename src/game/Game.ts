@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
-import { CellType, IPosition } from "../types";
+import { CellType, IPosition, IShip } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
 import { callUIApi } from "../react/reactApi";
@@ -53,24 +53,22 @@ class Game {
 
     // Draw ships
     store.ships.forEach((ship) => {
-      this.drawShip(ship.position.x, ship.position.y, ship.static).then(
-        (sprite) => {
-          if (!ship.static) {
-            app.ticker.add(() => {
-              sprite.x -= 1;
-              sprite.y += 0.5;
-            });
-          } else {
-            sprite.gotoAndStop(0);
-          }
+      this.drawShip(ship).then((sprite) => {
+        if (!ship.static) {
+          app.ticker.add(() => {
+            sprite.x -= 1;
+            sprite.y += 0.5;
+          });
+        } else {
+          sprite.gotoAndStop(0);
         }
-      );
+      });
     });
 
     // Draw map
-    store.map.forEach((elements, row) => {
-      elements.forEach((element, column) => {
-        this.drawMapElement(element as CellType, row, column);
+    store.scene.cells.forEach((rowOfCells, row) => {
+      rowOfCells.forEach((cell, column) => {
+        this.drawMapElement(cell, row, column);
       });
     });
   }
@@ -105,11 +103,7 @@ class Game {
     return frames;
   }
 
-  private async drawShip(
-    x: number,
-    y: number,
-    isStatic = false
-  ): Promise<PIXI.AnimatedSprite> {
+  private async drawShip(ship: IShip): Promise<PIXI.AnimatedSprite> {
     const frames = this.createFramesForAnimation(
       "ship-move",
       {
@@ -117,7 +111,7 @@ class Game {
         height: 500,
       },
       4,
-      isStatic ? 0 : 1
+      ship.static ? 0 : 1
     );
 
     const atlasData = {
@@ -143,27 +137,30 @@ class Game {
     await spritesheet.parse();
 
     // spritesheet is ready to use!
-    const ship = new PIXI.AnimatedSprite(spritesheet.animations.wave);
+    const shipSprite = new PIXI.AnimatedSprite(spritesheet.animations.wave);
 
     // set the animation speed
-    ship.animationSpeed = 0.05;
+    shipSprite.animationSpeed = 0.05;
     // play the animation on a loop
-    ship.play();
+    shipSprite.play();
 
-    const pos = cellPositionToScreenPosition({ x, y });
-    ship.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
+    const pos = cellPositionToScreenPosition(ship.position);
+    shipSprite.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
-    if (isStatic) {
-      ship.eventMode = "static";
-      addHoverStyling(ship);
-      ship.on("click", (e) => {
-        callUIApi("show-ship-info", { shipId: 1, clickPosition: e.client });
+    if (ship.static) {
+      shipSprite.eventMode = "static";
+      addHoverStyling(shipSprite);
+      shipSprite.on("click", (e) => {
+        callUIApi("show-ship-info", {
+          shipId: ship.id,
+          clickPosition: e.client,
+        });
       });
     }
     // add it to the stage to render
-    app.stage.addChild(ship);
+    app.stage.addChild(shipSprite);
 
-    return ship;
+    return shipSprite;
   }
 
   private drawMapElement(kind: CellType, row: number, column: number) {
