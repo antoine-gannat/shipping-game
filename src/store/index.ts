@@ -1,6 +1,6 @@
 import type { DeepReadonly } from "../types";
 import { handlers } from "./handlers";
-import type { IStore, StoreEvents } from "./types";
+import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
 type StoreListener = (newStore: DeepReadonly<IStore>) => void;
 const subscriptions: Array<StoreListener> = [];
@@ -39,12 +39,15 @@ export function subscribe(listener: StoreListener): StoreListener {
   };
 }
 
-export function dispatch(eventType: StoreEvents): DeepReadonly<IStore> {
+export function dispatch<E extends StoreEvent>(
+  eventType: E,
+  payload: StoreEventPayload<E>
+): DeepReadonly<IStore> {
   if (!handlers[eventType]) {
     console.error("Unknown event type", eventType);
     return store;
   }
-  store = handlers[eventType](store);
+  store = handlers[eventType](store, payload);
   subscriptions.forEach((listener) => listener(store));
   return store;
 }
