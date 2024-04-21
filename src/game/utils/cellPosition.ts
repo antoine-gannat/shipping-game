@@ -3,7 +3,7 @@ import {
   CELL_SIZE,
   MAGIC_X_POSITION_MULTIPLIER,
 } from "../constants";
-import { IPosition } from "../types";
+import { IPosition } from "../../types";
 
 /**
  * Calculate the position of the cell based on CELL_SIZE and the position.

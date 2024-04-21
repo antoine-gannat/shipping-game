@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import { IPosition } from "../types";
+import { IPosition } from "../../types";
 import { CELL_SIZE, MAGIC_X_POSITION_MULTIPLIER } from "../constants";
 import { shadeColor } from "../utils/shadeColor";
 import { degToRad } from "../utils/degrees";

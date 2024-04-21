@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
-import { IPosition } from "./types";
+import { IPosition } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
 import { callUIApi } from "../react/reactApi";

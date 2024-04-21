@@ -1,11 +1,15 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
+import { IPosition } from "../../types";
 
-interface IDialogProps {
-  onClose: () => void;
+export interface IDialog {
   title: string;
-  content: React.ReactNode;
-  position: { x: number; y: number };
+  content: string;
+  position: IPosition;
+}
+
+interface IDialogProps extends IDialog {
+  onClose: () => void;
 }
 
 const useStyles = createUseStyles({
@@ -87,7 +91,7 @@ export function Dialog({
         onMouseMove={onMouseMove}
       >
         <h1>{title}</h1>
-        {content}
+        <p>{content}</p>
       </div>
       <button className={styles.button} onClick={onClose}>
         X

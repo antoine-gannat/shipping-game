@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createUseStyles } from "react-jss";
 import { registerUIApi } from "./reactApi";
-import { Dialog } from "./Components/Dialog";
+import { Dialog, IDialog } from "./Components/Dialog";
 
 const useStyles = createUseStyles({
   root: {
@@ -18,45 +18,29 @@ const useStyles = createUseStyles({
 
 export function App() {
   const styles = useStyles();
-  const [dialogs, setDialogs] = React.useState<React.ReactNode[]>([]);
-
-  const addDialogWithClose = React.useCallback(
-    (
-      title: string,
-      content: React.ReactNode,
-      position: { x: number; y: number }
-    ) => {
-      const newEl = (
-        <Dialog
-          position={position}
-          onClose={() => {
-            // TO FIX
-            setDialogs((prev) => prev.filter((el) => el !== newEl));
-          }}
-          title={title}
-          content={content}
-        />
-      );
-      setDialogs((prev) => [...prev, newEl]);
-    },
-    []
-  );
+  const [dialogs, setDialogs] = React.useState<Record<string, IDialog>>({});
 
   React.useEffect(() => {
     const cleanups = [
       registerUIApi("show-ship-info", (e) =>
-        addDialogWithClose(
-          `Ship ${e.shipId} info`,
-          <p>Ship info here</p>,
-          e.clickPosition
-        )
+        setDialogs((prev) => ({
+          ...prev,
+          [`ship-${e.shipId}`]: {
+            title: `Ship ${e.shipId} info`,
+            content: "Ship info here",
+            position: e.clickPosition,
+          },
+        }))
       ),
       registerUIApi("show-building-info", (e) =>
-        addDialogWithClose(
-          `Building ${e.buildingId} info`,
-          <p>Building info here</p>,
-          e.clickPosition
-        )
+        setDialogs((prev) => ({
+          ...prev,
+          [`building-${e.buildingId}`]: {
+            title: `Building ${e.buildingId} info`,
+            content: "Building info here",
+            position: e.clickPosition,
+          },
+        }))
       ),
     ];
 
@@ -65,14 +49,24 @@ export function App() {
     };
   }, []);
 
-  if (dialogs.length === 0) {
+  if (Object.keys(dialogs).length === 0) {
     return null;
   }
 
   return (
     <div className={styles.root}>
-      {dialogs.map((dialog, index) => (
-        <React.Fragment key={index}>{dialog}</React.Fragment>
+      {Object.keys(dialogs).map((dialogId) => (
+        <Dialog
+          key={dialogId}
+          {...dialogs[dialogId]}
+          onClose={() =>
+            setDialogs((prev) => {
+              const copy = { ...prev };
+              delete copy[dialogId];
+              return copy;
+            })
+          }
+        />
       ))}
     </div>
   );
