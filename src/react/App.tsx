@@ -24,7 +24,7 @@ export function App() {
 
   React.useEffect(() => {
     // listen for store changes and return cleanup fct
-    return subscribe(setStore);
+    return subscribe((_, newStore) => setStore(newStore));
   }, []);
 
   // don't render until we have the store

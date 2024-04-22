@@ -15,6 +15,7 @@ type Inventory = Record<string, number>;
 export interface IPortScene {
   kind: "port";
   cells: CellType[][];
+  ships: IShip[];
   inventory: Inventory;
 }
 

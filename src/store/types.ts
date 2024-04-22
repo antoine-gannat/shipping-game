@@ -1,9 +1,8 @@
-import type { IPortScene, IShip, IWorldScene } from "../types";
+import type { IPortScene, IWorldScene } from "../types";
 
 export interface IStore {
   // active scene
   scene: IPortScene | IWorldScene;
-  ships: IShip[];
 }
 
 export type StoreEvent = "changePortInventory" | "changeScene";

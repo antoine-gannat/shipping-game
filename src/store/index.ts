@@ -3,7 +3,12 @@ import { PORT_A_CELLS } from "./constants";
 import { handlers } from "./handlers";
 import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
-type StoreListener = (newStore: DeepReadonly<IStore>) => void;
+type StoreListener = (
+  // The previous state of the store, null if this is the first call
+  prevStore: DeepReadonly<IStore> | null,
+  // The new state of the store
+  newStore: DeepReadonly<IStore>
+) => void;
 const subscriptions: Array<StoreListener> = [];
 
 // store instance with initial values
@@ -12,15 +17,15 @@ let store: IStore = {
     kind: "port",
     cells: PORT_A_CELLS, // use port A as default
     inventory: {},
+    ships: [
+      {
+        id: 1,
+        position: { x: 3, y: 3 },
+        static: true,
+        inventory: {},
+      },
+    ],
   },
-  ships: [
-    {
-      id: 1,
-      position: { x: 3, y: 3 },
-      static: true,
-      inventory: {},
-    },
-  ],
 };
 
 export function getStore(): DeepReadonly<IStore> {
@@ -34,7 +39,7 @@ export function getStore(): DeepReadonly<IStore> {
 export function subscribe(listener: StoreListener): () => void {
   subscriptions.push(listener);
   // send the current store on subscription
-  listener(store);
+  listener(/* prevStore */ null, store);
   return () => {
     const index = subscriptions.indexOf(listener);
     if (index !== -1) {
@@ -51,7 +56,8 @@ export function dispatch<E extends StoreEvent>(
     console.error("Unknown event type", eventType);
     return store;
   }
+  const previousStore = store;
   store = handlers[eventType](store, payload);
-  subscriptions.forEach((listener) => listener(store));
+  subscriptions.forEach((listener) => listener(previousStore, store));
   return store;
 }

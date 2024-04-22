@@ -6,7 +6,7 @@ import { CellType, IPosition, IShip } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
 import { callUIApi } from "../react/reactApi";
-import { getStore } from "../store";
+import { subscribe } from "../store";
 
 interface ICellInfo {
   size: number;
@@ -49,26 +49,34 @@ class Game {
     window.addEventListener("wheel", this.onWheel.bind(this));
     window.addEventListener("mouseout", this.onMouseUp.bind(this));
 
-    const store = getStore();
+    subscribe((prevStore, newStore) => {
+      if (prevStore?.scene.kind === newStore.scene.kind) {
+        // only re-render if we change scene
+        return;
+      }
+      // clear the stage
+      app.stage.removeChildren();
 
-    // Draw ships
-    store.ships.forEach((ship) => {
-      this.drawShip(ship).then((sprite) => {
-        if (!ship.static) {
-          app.ticker.add(() => {
-            sprite.x -= 1;
-            sprite.y += 0.5;
+      // Draw ships
+      "ships" in newStore.scene &&
+        newStore.scene.ships.forEach((ship) => {
+          this.drawShip(ship).then((sprite) => {
+            if (!ship.static) {
+              app.ticker.add(() => {
+                sprite.x -= 1;
+                sprite.y += 0.5;
+              });
+            } else {
+              sprite.gotoAndStop(0);
+            }
           });
-        } else {
-          sprite.gotoAndStop(0);
-        }
-      });
-    });
+        });
 
-    // Draw map
-    store.scene.cells.forEach((rowOfCells, row) => {
-      rowOfCells.forEach((cell, column) => {
-        this.drawMapElement(cell, row, column);
+      // Draw map
+      newStore.scene.cells.forEach((rowOfCells, row) => {
+        rowOfCells.forEach((cell, column) => {
+          this.drawMapElement(cell, row, column);
+        });
       });
     });
   }

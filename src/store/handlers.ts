@@ -21,10 +21,18 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
         // TOOD: fetch from port DB
         return {
           ...store,
-          scene: { kind: "port", cells: PORT_A_CELLS, inventory: {} },
+          scene: {
+            kind: "port",
+            cells: PORT_A_CELLS,
+            inventory: {},
+            ships: [],
+          },
         };
       case "world":
-        return { ...store, scene: { kind: "world", cells: [], inventory: {} } };
+        return {
+          ...store,
+          scene: { kind: "world", cells: [], inventory: {} },
+        };
       default:
         console.error("Unknown scene kind", sceneKind);
         return store;
