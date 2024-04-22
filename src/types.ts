@@ -7,6 +7,21 @@ export interface IShip {
   id: number;
   position: IPosition;
   static: boolean;
+  inventory: Inventory;
+}
+
+type Inventory = Record<string, number>;
+
+export interface IPortScene {
+  kind: "port";
+  cells: CellType[][];
+  inventory: Inventory;
+}
+
+export interface IWorldScene {
+  kind: "world";
+  cells: CellType[][];
+  // TODO: add world scene properties
 }
 
 export enum CellType {

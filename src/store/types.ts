@@ -1,16 +1,4 @@
-import type { CellType, IShip } from "../types";
-
-interface IPortScene {
-  kind: "port";
-  cells: CellType[][];
-  inventory: Record<string, number>;
-}
-
-interface IWorldScene {
-  kind: "world";
-  cells: CellType[][];
-  // TODO: add world scene properties
-}
+import type { IPortScene, IShip, IWorldScene } from "../types";
 
 export interface IStore {
   // active scene

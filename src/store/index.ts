@@ -1,4 +1,5 @@
 import type { DeepReadonly } from "../types";
+import { PORT_A_CELLS } from "./constants";
 import { handlers } from "./handlers";
 import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
@@ -9,15 +10,7 @@ const subscriptions: Array<StoreListener> = [];
 let store: IStore = {
   scene: {
     kind: "port",
-    cells: [
-      [1, 1, 1, 1, 1, 2, 2],
-      [0, 1, 1, 1, 0, 0, 0],
-      [0, 1, 1, 1, 0, 0, 0],
-      [0, 1, 1, 1, 1, 1, 0],
-      [0, 1, 1, 1, 1, 3, 0],
-      [0, 1, 0, 0, 1, 3, 0],
-      [0, 1, 0, 0, 0, 0, 0],
-    ],
+    cells: PORT_A_CELLS, // use port A as default
     inventory: {},
   },
   ships: [
@@ -25,6 +18,7 @@ let store: IStore = {
       id: 1,
       position: { x: 3, y: 3 },
       static: true,
+      inventory: {},
     },
   ],
 };
