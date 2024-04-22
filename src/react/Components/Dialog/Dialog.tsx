@@ -1,6 +1,6 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { IPosition } from "../../types";
+import { IPosition } from "../../../types";
 
 export interface IDialog {
   title: string;

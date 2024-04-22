@@ -1,73 +1,44 @@
 import * as React from "react";
 import { createUseStyles } from "react-jss";
-import { registerUIApi } from "./reactApi";
-import { Dialog, IDialog } from "./Components/Dialog";
+import { IStore } from "../store/types";
+import { subscribe } from "../store";
+import { DeepReadonly } from "../types";
+import { Navbar } from "./Components/Navbar/Navbar";
+import { IBaseProps } from "./types";
+import { DialogRenderer } from "./Components/Dialog/DialogRenderer";
 
 const useStyles = createUseStyles({
   root: {
     top: 0,
     left: 0,
-    // width: "100%",
-    // height: "100%",
+    width: "100%",
     position: "absolute",
     zIndex: 10,
     backgroundColor: "transparent",
-    // userSelect: "none",
   },
 });
 
 export function App() {
   const styles = useStyles();
-  const [dialogs, setDialogs] = React.useState<Record<string, IDialog>>({});
+  const [store, setStore] = React.useState<DeepReadonly<IStore>>();
 
   React.useEffect(() => {
-    const cleanups = [
-      registerUIApi("show-ship-info", (e) =>
-        setDialogs((prev) => ({
-          ...prev,
-          [`ship-${e.shipId}`]: {
-            title: `Ship ${e.shipId} info`,
-            content: "Ship info here",
-            position: e.clickPosition,
-          },
-        }))
-      ),
-      registerUIApi("show-building-info", (e) =>
-        setDialogs((prev) => ({
-          ...prev,
-          [`building-${e.buildingId}`]: {
-            title: `Building ${e.buildingId} info`,
-            content: "Building info here",
-            position: e.clickPosition,
-          },
-        }))
-      ),
-    ];
-
-    return () => {
-      cleanups.forEach((fn) => fn());
-    };
+    // listen for store changes and return cleanup fct
+    return subscribe(setStore);
   }, []);
 
-  if (Object.keys(dialogs).length === 0) {
+  // don't render until we have the store
+  if (!store) {
     return null;
   }
 
+  const baseProps: IBaseProps = { store };
+
   return (
     <div className={styles.root}>
-      {Object.keys(dialogs).map((dialogId) => (
-        <Dialog
-          key={dialogId}
-          {...dialogs[dialogId]}
-          onClose={() =>
-            setDialogs((prev) => {
-              const copy = { ...prev };
-              delete copy[dialogId];
-              return copy;
-            })
-          }
-        />
-      ))}
+      {/* Navbar */}
+      <Navbar {...baseProps} />
+      <DialogRenderer {...baseProps} />
     </div>
   );
 }

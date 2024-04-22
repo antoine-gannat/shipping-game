@@ -6,12 +6,16 @@ export interface IStore {
   ships: IShip[];
 }
 
-export type StoreEvent = "changeInventory";
+export type StoreEvent = "changePortInventory" | "changeScene";
 
 export type StoreEventPayload<T extends StoreEvent> =
-  T extends "changeInventory" ? { item: string; amount: number } : never;
+  T extends "changePortInventory"
+    ? { item: string; amount: number }
+    : T extends "changeScene"
+    ? { sceneKind: IStore["scene"]["kind"] }
+    : never;
 
-export type StoreEventHandler = <T extends StoreEvent>(
+export type StoreEventHandler<T extends StoreEvent> = (
   store: IStore,
   payload: StoreEventPayload<T>
 ) => IStore;

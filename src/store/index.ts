@@ -27,8 +27,14 @@ export function getStore(): DeepReadonly<IStore> {
   return store;
 }
 
-export function subscribe(listener: StoreListener): StoreListener {
+/**
+ * Subscribe to changes in the store.
+ * @returns A cleanup function to unsubscribe
+ */
+export function subscribe(listener: StoreListener): () => void {
   subscriptions.push(listener);
+  // send the current store on subscription
+  listener(store);
   return () => {
     const index = subscriptions.indexOf(listener);
     if (index !== -1) {
