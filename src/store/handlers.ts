@@ -1,5 +1,6 @@
 import { PORT_A_CELLS } from "./constants";
 import type { StoreEventHandler, StoreEvent } from "./types";
+import { countriesToCells } from "./world";
 
 export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
   changePortInventory: (store, { item, amount }) => {
@@ -31,7 +32,7 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
       case "world":
         return {
           ...store,
-          scene: { kind: "world", cells: [], inventory: {} },
+          scene: { kind: "world", cells: countriesToCells(), inventory: {} },
         };
       default:
         console.error("Unknown scene kind", sceneKind);
