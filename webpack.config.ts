@@ -1,5 +1,6 @@
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyPlugin from "copy-webpack-plugin";
 
 export default {
   entry: "./src/index.tsx",
@@ -22,6 +23,9 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: "public/index.html",
+    }),
+    new CopyPlugin({
+      patterns: [{ from: "public/assets", to: "assets" }],
     }),
   ],
 };

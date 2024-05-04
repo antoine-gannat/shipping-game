@@ -170,7 +170,7 @@ class Game {
         ).element
       );
     if (cellInfo.asset) {
-      const sprite = PIXI.Sprite.from(`/assets/${cellInfo.asset}.png`);
+      const sprite = PIXI.Sprite.from(`./assets/${cellInfo.asset}.png`);
       const scaleDownAmount = CELL_SIZE / cellInfo.size;
       sprite.scale.set(scaleDownAmount);
 

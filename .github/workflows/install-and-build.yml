@@ -25,5 +25,5 @@ jobs:
         env:
           REPO: self
           BRANCH: built-client
-          FOLDER: packages/web-app/dist
+          FOLDER: dist
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
