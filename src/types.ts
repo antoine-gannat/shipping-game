@@ -12,9 +12,21 @@ export interface IShip {
 
 type Inventory = Record<string, number>;
 
+interface ICellInfo {
+  size: number;
+  // asset or cellColor should be defined
+  asset?: string;
+  cellColor?: string;
+  isInteractive: boolean;
+}
+
+export type CellType = number;
+
 export interface IPortScene {
   kind: "port";
   cells: CellType[][];
+  // Defines what each cell type looks like
+  cellsInfo: Record<CellType, ICellInfo>;
   ships: IShip[];
   inventory: Inventory;
 }
@@ -22,14 +34,9 @@ export interface IPortScene {
 export interface IWorldScene {
   kind: "world";
   cells: CellType[][];
+  // Defines what each cell type looks like
+  cellsInfo: Record<CellType, ICellInfo>;
   // TODO: add world scene properties
-}
-
-export enum CellType {
-  Sea,
-  Empty,
-  Building,
-  Containers,
 }
 
 // Utils

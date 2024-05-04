@@ -1,4 +1,4 @@
-import { PORT_A_CELLS } from "./constants";
+import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
 import type { StoreEventHandler, StoreEvent } from "./types";
 import { worldCells } from "./world";
 
@@ -19,12 +19,13 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
   changeScene: (store, { sceneKind }) => {
     switch (sceneKind) {
       case "port":
-        // TOOD: fetch from port DB
+        // TODO: fetch from port DB
         return {
           ...store,
           scene: {
             kind: "port",
             cells: PORT_A_CELLS,
+            cellsInfo: PORT_A_CELLS_INFO,
             inventory: {},
             ships: [],
           },
@@ -32,7 +33,12 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
       case "world":
         return {
           ...store,
-          scene: { kind: "world", cells: worldCells, inventory: {} },
+          scene: {
+            kind: "world",
+            cells: worldCells,
+            cellsInfo: {},
+            inventory: {},
+          },
         };
       default:
         console.error("Unknown scene kind", sceneKind);

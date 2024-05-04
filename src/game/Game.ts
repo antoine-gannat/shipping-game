@@ -8,35 +8,6 @@ import { addHoverStyling } from "./utils/addHoverStyling";
 import { callUIApi } from "../react/reactApi";
 import { getStore, subscribe } from "../store";
 
-interface ICellInfo {
-  size: number;
-  asset: string | null;
-  isInteractive: boolean;
-}
-
-const cellsInfo: Record<CellType, ICellInfo> = {
-  [CellType.Sea]: {
-    size: 100,
-    asset: null,
-    isInteractive: false,
-  },
-  [CellType.Empty]: {
-    size: 100,
-    asset: null,
-    isInteractive: false,
-  },
-  [CellType.Building]: {
-    size: 300,
-    asset: "building1",
-    isInteractive: true,
-  },
-  [CellType.Containers]: {
-    size: 200,
-    asset: "containers",
-    isInteractive: true,
-  },
-};
-
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
   constructor() {
@@ -172,31 +143,42 @@ class Game {
   }
 
   private drawMapElement(kind: CellType, row: number, column: number) {
-    if (kind === CellType.Sea) {
+    const store = getStore();
+    const cellInfo = store.scene.cellsInfo[kind as CellType];
+
+    // if no render information is given, don't render anything
+    if (!cellInfo.asset && !cellInfo.cellColor) {
+      console.log("dont render", kind);
       return;
     }
     const position = {
       x: column,
       y: row,
     };
-    const store = getStore();
+    // calculate if the cell has neighbors, if not, we'll render the sides
     const hasLeftNeighbor =
       store.scene.cells[position.y + 1]?.[position.x] === kind;
     const hasRightNeighbor =
       store.scene.cells[position.y]?.[position.x + 1] === kind;
-    app.stage.addChild(
-      new Cell(position, `#FFFFFF`, hasLeftNeighbor, hasRightNeighbor).element
-    );
-    const cell = cellsInfo[kind as CellType];
-    if (cell.asset) {
-      const sprite = PIXI.Sprite.from(`/assets/${cell.asset}.png`);
-      const scaleDownAmount = CELL_SIZE / cell.size;
+    // create the cell
+    cellInfo.cellColor &&
+      app.stage.addChild(
+        new Cell(
+          position,
+          cellInfo.cellColor,
+          hasLeftNeighbor,
+          hasRightNeighbor
+        ).element
+      );
+    if (cellInfo.asset) {
+      const sprite = PIXI.Sprite.from(`/assets/${cellInfo.asset}.png`);
+      const scaleDownAmount = CELL_SIZE / cellInfo.size;
       sprite.scale.set(scaleDownAmount);
 
       const { x, y } = cellPositionToScreenPosition(position);
       sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
 
-      if (cell.isInteractive) {
+      if (cellInfo.isInteractive) {
         sprite.eventMode = "static";
         addHoverStyling(sprite);
 

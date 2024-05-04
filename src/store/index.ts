@@ -1,5 +1,5 @@
 import type { DeepReadonly } from "../types";
-import { PORT_A_CELLS } from "./constants";
+import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
 import { handlers } from "./handlers";
 import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
@@ -16,6 +16,7 @@ let store: IStore = {
   scene: {
     kind: "port",
     cells: PORT_A_CELLS, // use port A as default
+    cellsInfo: PORT_A_CELLS_INFO,
     inventory: {},
     ships: [
       {
