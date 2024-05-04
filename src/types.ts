@@ -34,7 +34,7 @@ export interface IPortScene {
 export interface IWorldScene {
   kind: "world";
   cells: CellType[][];
-  // Defines what each cell type looks like
+  // Defines what each cell type looks like.
   cellsInfo: Record<CellType, ICellInfo>;
   // TODO: add world scene properties
 }
