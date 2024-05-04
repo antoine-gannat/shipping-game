@@ -1,4 +1,6 @@
-import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
+import { ICellInfo } from "../types";
+import { randomInteger } from "../utils/rand";
+import { PORT_A_CELLS, PORT_A_CELLS_INFO, countryColors } from "./constants";
 import type { StoreEventHandler, StoreEvent } from "./types";
 import { worldCells } from "./world";
 
@@ -36,7 +38,24 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
           scene: {
             kind: "world",
             cells: worldCells,
-            cellsInfo: {},
+            cellsInfo: Array.from({ length: 159 /* nb countries */ }).reduce<
+              Record<number, ICellInfo>
+            >((acc, _, i) => {
+              if (i === 0) {
+                acc[i] = {
+                  size: 100,
+                  isInteractive: false,
+                };
+                return acc;
+              }
+              acc[i] = {
+                size: 100,
+                cellColor:
+                  countryColors[randomInteger(0, countryColors.length - 1)],
+                isInteractive: true,
+              };
+              return acc;
+            }, {}),
             inventory: {},
           },
         };

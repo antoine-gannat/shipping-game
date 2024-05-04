@@ -148,7 +148,6 @@ class Game {
 
     // if no render information is given, don't render anything
     if (!cellInfo.asset && !cellInfo.cellColor) {
-      console.log("dont render", kind);
       return;
     }
     const position = {

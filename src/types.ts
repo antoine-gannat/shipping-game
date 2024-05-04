@@ -12,7 +12,7 @@ export interface IShip {
 
 type Inventory = Record<string, number>;
 
-interface ICellInfo {
+export interface ICellInfo {
   size: number;
   // asset or cellColor should be defined
   asset?: string;
