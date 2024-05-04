@@ -6,7 +6,7 @@ import { CellType, IPosition, IShip } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
 import { callUIApi } from "../react/reactApi";
-import { subscribe } from "../store";
+import { getStore, subscribe } from "../store";
 
 interface ICellInfo {
   size: number;
@@ -179,7 +179,14 @@ class Game {
       x: column,
       y: row,
     };
-    app.stage.addChild(new Cell(position, `#FFFFFF`).element);
+    const store = getStore();
+    const hasLeftNeighbor =
+      store.scene.cells[position.y + 1]?.[position.x] === kind;
+    const hasRightNeighbor =
+      store.scene.cells[position.y]?.[position.x + 1] === kind;
+    app.stage.addChild(
+      new Cell(position, `#FFFFFF`, hasLeftNeighbor, hasRightNeighbor).element
+    );
     const cell = cellsInfo[kind as CellType];
     if (cell.asset) {
       const sprite = PIXI.Sprite.from(`/assets/${cell.asset}.png`);
