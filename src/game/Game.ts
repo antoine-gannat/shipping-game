@@ -127,7 +127,6 @@ class Game {
     shipSprite.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
     if (ship.static) {
-      shipSprite.eventMode = "static";
       addHoverStyling(shipSprite);
       shipSprite.on("click", (e) => {
         callUIApi("show-ship-info", {
@@ -159,16 +158,18 @@ class Game {
       store.scene.cells[position.y + 1]?.[position.x] === kind;
     const hasRightNeighbor =
       store.scene.cells[position.y]?.[position.x + 1] === kind;
+
+    let cell: Cell;
     // create the cell
-    cellInfo.cellColor &&
-      app.stage.addChild(
-        new Cell(
-          position,
-          cellInfo.cellColor,
-          hasLeftNeighbor,
-          hasRightNeighbor
-        ).element
+    if (cellInfo.cellColor) {
+      cell = new Cell(
+        position,
+        cellInfo.cellColor,
+        hasLeftNeighbor,
+        hasRightNeighbor
       );
+      app.stage.addChild(cell.element);
+    }
     if (cellInfo.asset) {
       const sprite = PIXI.Sprite.from(`./assets/${cellInfo.asset}.png`);
       const scaleDownAmount = CELL_SIZE / cellInfo.size;
@@ -178,7 +179,6 @@ class Game {
       sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
 
       if (cellInfo.isInteractive) {
-        sprite.eventMode = "static";
         addHoverStyling(sprite);
 
         sprite.on("click", (e) => {
@@ -189,6 +189,14 @@ class Game {
         });
       }
       app.stage.addChild(sprite);
+    } else if (cellInfo.cellColor && cellInfo.isInteractive) {
+      addHoverStyling(cell.element);
+      cell.element.on("click", (e) => {
+        callUIApi("show-country-info", {
+          countryId: kind,
+          clickPosition: e.client,
+        });
+      });
     }
   }
 

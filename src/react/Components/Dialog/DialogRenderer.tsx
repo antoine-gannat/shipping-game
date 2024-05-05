@@ -2,6 +2,7 @@ import React from "react";
 import { IBaseProps } from "../../types";
 import { Dialog, IDialog } from "./Dialog";
 import { registerUIApi } from "../../reactApi";
+import { getCountryFromId } from "../../../store/world";
 
 export function DialogRenderer(_: IBaseProps): React.ReactElement {
   const [dialogs, setDialogs] = React.useState<Record<string, IDialog>>({});
@@ -25,6 +26,16 @@ export function DialogRenderer(_: IBaseProps): React.ReactElement {
           [`building-${e.buildingId}`]: {
             title: `Building ${e.buildingId} info`,
             content: "Building info here",
+            position: e.clickPosition,
+          },
+        }))
+      ),
+      registerUIApi("show-country-info", (e) =>
+        setDialogs((prev) => ({
+          ...prev,
+          [`country-${e.countryId}`]: {
+            title: getCountryFromId(e.countryId),
+            content: "Country info here",
             position: e.clickPosition,
           },
         }))

@@ -1,9 +1,11 @@
-type UIEvent = "show-ship-info" | "show-building-info";
+type UIEvent = "show-ship-info" | "show-building-info" | "show-country-info";
 
 type UIEventData<E extends UIEvent> = E extends "show-ship-info"
   ? { shipId: number; clickPosition: { x: number; y: number } }
   : E extends "show-building-info"
   ? { buildingId: number; clickPosition: { x: number; y: number } }
+  : E extends "show-country-info"
+  ? { countryId: number; clickPosition: { x: number; y: number } }
   : never;
 
 type UIEventCallback<E extends UIEvent> = (data: UIEventData<E>) => void;
@@ -11,6 +13,7 @@ type UIEventCallback<E extends UIEvent> = (data: UIEventData<E>) => void;
 const listeners: { [K in UIEvent]: UIEventCallback<K>[] } = {
   "show-ship-info": [],
   "show-building-info": [],
+  "show-country-info": [],
 };
 
 export function callUIApi<E extends UIEvent>(
