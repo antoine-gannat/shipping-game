@@ -27,6 +27,9 @@ class Game {
       }
       // clear the stage
       app.stage.removeChildren();
+      if (newStore.scene.defaultScale) {
+        app.stage.scale.x = app.stage.scale.y = newStore.scene.defaultScale;
+      }
 
       // Draw ships
       "ships" in newStore.scene &&
@@ -49,6 +52,8 @@ class Game {
           this.drawMapElement(cell, row, column);
         });
       });
+      // center the position (ish)
+      app.stage.position.set(app.stage.width / 2, 0);
     });
   }
 

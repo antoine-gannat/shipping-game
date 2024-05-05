@@ -7,10 +7,7 @@ export interface IShip {
   id: number;
   position: IPosition;
   static: boolean;
-  inventory: Inventory;
 }
-
-type Inventory = Record<string, number>;
 
 export interface ICellInfo {
   size: number;
@@ -22,20 +19,21 @@ export interface ICellInfo {
 
 export type CellType = number;
 
-export interface IPortScene {
-  kind: "port";
-  cells: CellType[][];
-  // Defines what each cell type looks like
-  cellsInfo: Record<CellType, ICellInfo>;
-  ships: IShip[];
-  inventory: Inventory;
-}
-
-export interface IWorldScene {
-  kind: "world";
+interface IBaseScene {
   cells: CellType[][];
   // Defines what each cell type looks like.
   cellsInfo: Record<CellType, ICellInfo>;
+  defaultScale?: number;
+  defaultPosition?: number;
+}
+
+export interface IPortScene extends IBaseScene {
+  kind: "port";
+  ships: IShip[];
+}
+
+export interface IWorldScene extends IBaseScene {
+  kind: "world";
   // TODO: add world scene properties
 }
 

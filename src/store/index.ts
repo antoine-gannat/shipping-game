@@ -17,13 +17,11 @@ let store: IStore = {
     kind: "port",
     cells: PORT_A_CELLS, // use port A as default
     cellsInfo: PORT_A_CELLS_INFO,
-    inventory: {},
     ships: [
       {
         id: 1,
         position: { x: 3, y: 3 },
         static: true,
-        inventory: {},
       },
     ],
   },

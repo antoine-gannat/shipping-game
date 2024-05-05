@@ -5,14 +5,11 @@ export interface IStore {
   scene: IPortScene | IWorldScene;
 }
 
-export type StoreEvent = "changePortInventory" | "changeScene";
+export type StoreEvent = "changeScene";
 
-export type StoreEventPayload<T extends StoreEvent> =
-  T extends "changePortInventory"
-    ? { item: string; amount: number }
-    : T extends "changeScene"
-    ? { sceneKind: IStore["scene"]["kind"] }
-    : never;
+export type StoreEventPayload<T extends StoreEvent> = T extends "changeScene"
+  ? { sceneKind: IStore["scene"]["kind"] }
+  : never;
 
 export type StoreEventHandler<T extends StoreEvent> = (
   store: IStore,

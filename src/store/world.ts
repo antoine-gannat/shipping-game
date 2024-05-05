@@ -1,5 +1,4 @@
 import { CellType, ICellInfo } from "../types";
-import { randomInteger } from "../utils/rand";
 
 const countryColors = [
   "#FF0000",
@@ -207,7 +206,7 @@ export const worldCellInfo = Array.from({
   }
   acc[i] = {
     size: 100,
-    cellColor: countryColors[randomInteger(0, countryColors.length - 1)],
+    cellColor: countryColors[i % countryColors.length],
     isInteractive: true,
   };
   return acc;
