@@ -1,33 +1,5 @@
 import { CellType, ICellInfo } from "../types";
 
-const countryColors = [
-  "#FF0000",
-  "#00FF00",
-  "#0000FF",
-  "#FFFF00",
-  "#FF00FF",
-  "#00FFFF",
-  "#000000",
-  "#FFFFFF",
-  "#C0C0C0",
-  "#808080",
-  "#800000",
-  "#808000",
-  "#008000",
-  "#800080",
-  "#008080",
-  "#000080",
-  "#FFA07A",
-  "#20B2AA",
-  "#FF6347",
-  "#7B68EE",
-  "#00FA9A",
-  "#FFD700",
-  "#FF69B4",
-  "#D2B48C",
-  "#A52A2A",
-];
-
 const countries = [
   "Sea", // 0
   "Greenland",
@@ -188,29 +160,41 @@ const countries = [
   "New Caledonia",
   "Fiji",
   "Australia",
-];
+] as const;
+
+type Country = (typeof countries)[number];
+
+// TODO: Store in DB
+const ownedCountries: Array<Country> = ["France"];
 
 export function getCountryFromId(id: number) {
   return countries[id];
 }
 
-export const worldCellInfo = Array.from({
-  length: 159 /* nb countries + 2 */,
-}).reduce<Record<number, ICellInfo>>((acc, _, i) => {
-  if (i === 0) {
+// Create a world cell info object with the countries and their colors
+export function createWorldCellInfo() {
+  return Array.from({
+    length: 159 /* nb countries + 2 */,
+  }).reduce<Record<number, ICellInfo>>((acc, _, i) => {
+    if (i === 0) {
+      acc[i] = {
+        size: 100,
+        isInteractive: false,
+      };
+      return acc;
+    }
+    const countryName = countries[i];
+    const cellColor = ownedCountries.includes(countryName)
+      ? "#C500FF"
+      : "#444444";
     acc[i] = {
       size: 100,
-      isInteractive: false,
+      cellColor,
+      isInteractive: true,
     };
     return acc;
-  }
-  acc[i] = {
-    size: 100,
-    cellColor: countryColors[i % countryColors.length],
-    isInteractive: true,
-  };
-  return acc;
-}, {});
+  }, {});
+}
 
 export const worldCells: CellType[][] = [
   [

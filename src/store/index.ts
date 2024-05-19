@@ -1,5 +1,5 @@
 import type { DeepReadonly } from "../types";
-import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
+import { defaultStore } from "./default";
 import { handlers } from "./handlers";
 import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
@@ -12,20 +12,7 @@ type StoreListener = (
 const subscriptions: Array<StoreListener> = [];
 
 // store instance with initial values
-let store: IStore = {
-  scene: {
-    kind: "port",
-    cells: PORT_A_CELLS, // use port A as default
-    cellsInfo: PORT_A_CELLS_INFO,
-    ships: [
-      {
-        id: 1,
-        position: { x: 3, y: 3 },
-        static: true,
-      },
-    ],
-  },
-};
+let store: IStore = defaultStore;
 
 export function getStore(): DeepReadonly<IStore> {
   return store;

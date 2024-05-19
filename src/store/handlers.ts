@@ -1,7 +1,7 @@
 import { CAMERA_MIN_SCALE } from "../game/constants";
 import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
 import type { StoreEventHandler, StoreEvent } from "./types";
-import { worldCellInfo, worldCells } from "./world";
+import { createWorldCellInfo, worldCells } from "./world";
 
 export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
   changeScene: (store, { sceneKind }) => {
@@ -24,7 +24,7 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
           scene: {
             kind: "world",
             cells: worldCells,
-            cellsInfo: worldCellInfo,
+            cellsInfo: createWorldCellInfo(),
             defaultScale: CAMERA_MIN_SCALE,
             inventory: {},
           },

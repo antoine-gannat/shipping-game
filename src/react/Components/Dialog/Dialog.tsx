@@ -4,7 +4,10 @@ import { IPosition } from "../../../types";
 
 export interface IDialog {
   title: string;
-  content: string;
+  content: {
+    text?: string;
+    button?: { text: string; onClick: () => void };
+  };
   position: IPosition;
 }
 
@@ -91,7 +94,12 @@ export function Dialog({
         onMouseMove={onMouseMove}
       >
         <h1>{title}</h1>
-        <p>{content}</p>
+        {content.text && <p>{content.text}</p>}
+        {content.button && (
+          <button onClick={() => (content.button.onClick(), onClose())}>
+            {content.button.text}
+          </button>
+        )}
       </div>
       <button className={styles.button} onClick={onClose}>
         X
