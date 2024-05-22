@@ -1,19 +1,7 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { IPosition } from "../../../types";
-
-export interface IDialog {
-  title: string;
-  content: {
-    text?: string;
-    button?: { text: string; onClick: () => void };
-  };
-  position: IPosition;
-}
-
-interface IDialogProps extends IDialog {
-  onClose: () => void;
-}
+import { IDialog, IDialogContentButton, IDialogContentText } from "../../types";
+import { dispatch } from "../../../store";
 
 const useStyles = createUseStyles({
   root: {
@@ -44,16 +32,35 @@ const useStyles = createUseStyles({
   },
 });
 
-export function Dialog({
-  onClose,
-  title,
-  content,
-  position,
-}: IDialogProps): React.ReactElement {
-  const [positionState, setPosition] = React.useState({ ...position });
+function TextContent({ text }: IDialogContentText): React.ReactElement {
+  return <p>{text}</p>;
+}
+
+function ButtonContent({
+  text,
+  onClick,
+  closeDialog,
+  closeOnClick,
+}: IDialogContentButton & { closeDialog: () => void }): React.ReactElement {
+  const onClickHandler = () => {
+    onClick();
+    if (closeOnClick) {
+      closeDialog();
+    }
+  };
+  return <button onClick={onClickHandler}>{text}</button>;
+}
+
+export function Dialog({ dialog }: { dialog: IDialog }): React.ReactElement {
+  const [positionState, setPosition] = React.useState({ ...dialog.position });
   const lastClickPosRef = React.useRef<{ x: number; y: number }>();
   const initalClickOffset = React.useRef<{ x: number; y: number }>();
   const styles = useStyles();
+
+  const closeDialog = React.useCallback(
+    () => dispatch("removeDialog", dialog),
+    [dialog]
+  );
 
   const onMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
@@ -93,15 +100,17 @@ export function Dialog({
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
       >
-        <h1>{title}</h1>
-        {content.text && <p>{content.text}</p>}
-        {content.button && (
-          <button onClick={() => (content.button.onClick(), onClose())}>
-            {content.button.text}
-          </button>
-        )}
+        <h1>{dialog.title}</h1>
+        {dialog.content.map((c, i) => {
+          switch (c.kind) {
+            case "text":
+              return <TextContent key={i} {...c} />;
+            case "button":
+              return <ButtonContent key={i} closeDialog={closeDialog} {...c} />;
+          }
+        })}
       </div>
-      <button className={styles.button} onClick={onClose}>
+      <button className={styles.button} onClick={closeDialog}>
         X
       </button>
     </div>

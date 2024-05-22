@@ -4,8 +4,8 @@ import { IStore } from "../store/types";
 import { subscribe } from "../store";
 import { DeepReadonly } from "../types";
 import { Navbar } from "./Components/Navbar/Navbar";
-import { IBaseProps } from "./types";
-import { DialogRenderer } from "./Components/Dialog/DialogRenderer";
+import { IBaseProps, IDialog } from "./types";
+import { Dialog } from "./Components/Dialog/Dialog";
 
 const useStyles = createUseStyles({
   root: {
@@ -38,7 +38,9 @@ export function App() {
     <div className={styles.root}>
       {/* Navbar */}
       <Navbar {...baseProps} />
-      <DialogRenderer {...baseProps} />
+      {store.dialogs.map((dialog) => (
+        <Dialog key={dialog.title} dialog={dialog as IDialog} />
+      ))}
     </div>
   );
 }

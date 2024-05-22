@@ -10,4 +10,5 @@ export const defaultStore: IStore = {
     cellsInfo: createWorldCellInfo(),
     defaultScale: CAMERA_MIN_SCALE,
   },
+  dialogs: [],
 };

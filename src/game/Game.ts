@@ -5,8 +5,8 @@ import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
 import { CellType, IPosition, IShip } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
-import { callUIApi } from "../react/reactApi";
-import { getStore, subscribe } from "../store";
+import { dispatch, getStore, subscribe } from "../store";
+import { getCountryFromId } from "../store/world";
 
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
@@ -134,9 +134,10 @@ class Game {
     if (ship.static) {
       addHoverStyling(shipSprite);
       shipSprite.on("click", (e) => {
-        callUIApi("show-ship-info", {
-          shipId: ship.id,
-          clickPosition: e.client,
+        dispatch("createDialog", {
+          title: `Ship ${ship.id} info`,
+          position: e.client,
+          content: [{ kind: "text", text: "This is a ship" }],
         });
       });
     }
@@ -187,9 +188,10 @@ class Game {
         addHoverStyling(sprite);
 
         sprite.on("click", (e) => {
-          callUIApi("show-building-info", {
-            buildingId: 1,
-            clickPosition: e.client,
+          dispatch("createDialog", {
+            title: "Building 1",
+            position: e.client,
+            content: [{ kind: "text", text: "This is a building" }],
           });
         });
       }
@@ -197,9 +199,19 @@ class Game {
     } else if (cellInfo.cellColor && cellInfo.isInteractive) {
       addHoverStyling(cell.element);
       cell.element.on("click", (e) => {
-        callUIApi("show-country-info", {
-          countryId: kind,
-          clickPosition: e.client,
+        dispatch("createDialog", {
+          title: "Country info",
+          position: e.client,
+          content: [
+            {
+              kind: "button",
+              text: getCountryFromId(kind),
+              onClick: () => {
+                dispatch("changeScene", { sceneKind: "port" });
+              },
+              closeOnClick: true,
+            },
+          ],
         });
       });
     }

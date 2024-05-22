@@ -34,4 +34,16 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
         return store;
     }
   },
+  createDialog: (store, dialog) => {
+    return {
+      ...store,
+      dialogs: [...store.dialogs, dialog],
+    };
+  },
+  removeDialog: (store, dialog) => {
+    return {
+      ...store,
+      dialogs: store.dialogs.filter((d) => d !== dialog),
+    };
+  },
 };
