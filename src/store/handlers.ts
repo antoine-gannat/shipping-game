@@ -1,4 +1,4 @@
-import { CAMERA_MIN_SCALE } from "../game/constants";
+import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE } from "../game/constants";
 import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
 import type { StoreEventHandler, StoreEvent } from "./types";
 import { createWorldCellInfo, worldCells } from "./world";
@@ -14,6 +14,7 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
             kind: "port",
             cells: PORT_A_CELLS,
             cellsInfo: PORT_A_CELLS_INFO,
+            defaultScale: CAMERA_MAX_SCALE / 2,
             inventory: {},
             ships: [],
           },
