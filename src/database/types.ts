@@ -1,12 +1,9 @@
-import { IPosition } from "../types";
-
 type ID = number;
 
 export interface IDbPort {
-  id: ID;
+  id?: ID;
   name: string;
-  position: IPosition;
-  owned: boolean;
+  owned: "true" | "false";
 }
 
 export interface IDbShip {

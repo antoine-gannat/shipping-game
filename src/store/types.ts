@@ -7,14 +7,23 @@ export interface IStore {
   dialogs: IDialog[];
 }
 
-export type StoreEvent = "changeScene" | "createDialog" | "removeDialog";
+export type StoreEvent =
+  | "visitPort"
+  | "viewWorld"
+  | "createDialog"
+  | "removeDialog"
+  | "buyPort";
 
-export type StoreEventPayload<T extends StoreEvent> = T extends "changeScene"
-  ? { sceneKind: IStore["scene"]["kind"] }
+export type StoreEventPayload<T extends StoreEvent> = T extends "visitPort"
+  ? { portName: string }
+  : T extends "viewWorld"
+  ? {}
   : T extends "createDialog"
   ? IDialog
   : T extends "removeDialog"
   ? IDialog
+  : T extends "buyPort"
+  ? { portName: string }
   : never;
 
 export type StoreEventHandler<T extends StoreEvent> = (

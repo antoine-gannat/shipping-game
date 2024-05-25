@@ -6,6 +6,8 @@ import { DeepReadonly } from "../types";
 import { Navbar } from "./Components/Navbar/Navbar";
 import { IBaseProps, IDialog } from "./types";
 import { Dialog } from "./Components/Dialog/Dialog";
+import { db } from "../database";
+import { Welcome } from "./Components/Welcome/Welcome";
 
 const useStyles = createUseStyles({
   root: {
@@ -21,8 +23,21 @@ const useStyles = createUseStyles({
 export function App() {
   const styles = useStyles();
   const [store, setStore] = React.useState<DeepReadonly<IStore>>();
+  const [isNewPlayer, setIsNewPlayer] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    // check if the user is a new player
+    db.ports
+      .where("owned")
+      .equals("true")
+      .count()
+      .then((ownedPortsCount) => {
+        console.log(ownedPortsCount);
+        if (ownedPortsCount === 0) {
+          setIsNewPlayer(true);
+        }
+      });
+
     // listen for store changes and return cleanup fct
     return subscribe((_, newStore) => setStore(newStore));
   }, []);
@@ -36,6 +51,8 @@ export function App() {
 
   return (
     <div className={styles.root}>
+      {/* Welcome screen for new players */}
+      {isNewPlayer && <Welcome />}
       {/* Navbar */}
       <Navbar {...baseProps} />
       {store.dialogs.map((dialog) => (

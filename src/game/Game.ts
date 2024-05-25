@@ -201,15 +201,24 @@ class Game {
     } else if (cellInfo.cellColor && cellInfo.isInteractive) {
       addHoverStyling(cell.element);
       cell.element.on("click", (e) => {
+        const countryName = getCountryFromId(kind);
         dispatch("createDialog", {
-          title: getCountryFromId(kind),
+          title: countryName,
           position: e.client,
           content: [
             {
               kind: "button",
+              text: "Buy port",
+              onClick: () => {
+                dispatch("buyPort", { portName: countryName });
+              },
+              closeOnClick: true,
+            },
+            {
+              kind: "button",
               text: "Visit port",
               onClick: () => {
-                dispatch("changeScene", { sceneKind: "port" });
+                dispatch("visitPort", { portName: countryName });
               },
               closeOnClick: true,
             },

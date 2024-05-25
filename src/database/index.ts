@@ -15,7 +15,7 @@ class Database extends Dexie {
   private initializeStores() {
     this.version(CURRENT_DB_VERSION).stores({
       ships: "++id, name, type, portId, journeyId",
-      ports: "++id, name, position, owned",
+      ports: "++id, name, owned",
       journeys:
         "++id, shipId, originPortId, destinationPortId, departureTime, duration",
     });

@@ -9,7 +9,7 @@ export function Navbar({ store }: IBaseProps): React.ReactElement {
   const isPort = store.scene.kind === "port";
 
   const onWorldBtnClick = React.useCallback(() => {
-    dispatch("changeScene", { sceneKind: "world" });
+    dispatch("viewWorld", {});
   }, []);
 
   return (
