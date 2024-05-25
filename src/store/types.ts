@@ -44,6 +44,7 @@ export interface IBaseScene<K extends string = string> {
 
 export interface IPortScene extends IBaseScene<"port"> {
   ships: IShip[];
+  portName: string;
 }
 
 export interface IWorldScene extends IBaseScene<"world"> {

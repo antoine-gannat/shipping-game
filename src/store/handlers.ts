@@ -19,11 +19,11 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
   },
   visitPort: async (store, { portName }) => {
     // TODO: Fetch port info from db using port name
-    portName;
     return {
       ...store,
       scene: {
         kind: "port",
+        portName,
         cells: PORT_A_CELLS,
         cellsInfo: PORT_A_CELLS_INFO,
         defaultScale: CAMERA_MAX_SCALE / 2,
