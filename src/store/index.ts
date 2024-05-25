@@ -1,5 +1,5 @@
 import type { DeepReadonly } from "../types";
-import { defaultStore } from "./default";
+import { createDefaultStore } from "./default";
 import { handlers } from "./handlers";
 import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
@@ -9,12 +9,21 @@ type StoreListener = (
   // The new state of the store
   newStore: DeepReadonly<IStore>
 ) => void;
+
+// List of subscribers to the store
 const subscriptions: Array<StoreListener> = [];
 
-// store instance with initial values
-let store: IStore = defaultStore;
+// Store instance. Do not access directly, instead use `getStore`.
+let store: IStore;
 
-export function getStore(): DeepReadonly<IStore> {
+function setStore(newStore: IStore) {
+  store = newStore;
+}
+
+export async function getStore(): Promise<DeepReadonly<IStore>> {
+  if (!store) {
+    store = await createDefaultStore();
+  }
   return store;
 }
 
@@ -25,7 +34,7 @@ export function getStore(): DeepReadonly<IStore> {
 export function subscribe(listener: StoreListener): () => void {
   subscriptions.push(listener);
   // send the current store on subscription
-  listener(/* prevStore */ null, store);
+  getStore().then((store) => listener(null, store));
   return () => {
     const index = subscriptions.indexOf(listener);
     if (index !== -1) {
@@ -34,16 +43,32 @@ export function subscribe(listener: StoreListener): () => void {
   };
 }
 
-export function dispatch<E extends StoreEvent>(
+export async function dispatch<E extends StoreEvent>(
   eventType: E,
   payload: StoreEventPayload<E>
-): DeepReadonly<IStore> {
-  if (!handlers[eventType]) {
-    console.error("Unknown event type", eventType);
-    return store;
-  }
-  const previousStore = store;
-  store = handlers[eventType](store, payload);
-  subscriptions.forEach((listener) => listener(previousStore, store));
-  return store;
+): Promise<DeepReadonly<IStore>> {
+  const promise = new Promise<IStore>((resolve) => {
+    // dispatch the event in the next tick, this helps with concurrency issues
+    setTimeout(async () => {
+      const previousStore = await getStore();
+      if (!handlers[eventType]) {
+        console.error("Unknown event type", eventType);
+        return previousStore;
+      }
+      const newStore = await handlers[eventType](
+        previousStore as IStore,
+        payload
+      );
+      subscriptions.forEach((listener) => listener(previousStore, newStore));
+      setStore(newStore);
+      resolve(newStore);
+    }, 0);
+  });
+  return promise;
 }
+
+/**
+ * 1. Dispatch an event to modify the store
+ * 2. Make sure the events are queued and processed in order
+ *
+ */

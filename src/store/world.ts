@@ -1,3 +1,4 @@
+import { db } from "../database";
 import { CellType, ICellInfo } from "../types";
 
 const countries = [
@@ -164,15 +165,16 @@ const countries = [
 
 type Country = (typeof countries)[number];
 
-// TODO: Store in DB
-const ownedCountries: Array<Country> = ["France"];
-
 export function getCountryFromId(id: number) {
   return countries[id];
 }
 
 // Create a world cell info object with the countries and their colors
-export function createWorldCellInfo() {
+export async function createWorldCellInfo() {
+  const ownedCountries = (await db.ports.toArray())
+    .map((p) => p.owned && (p.name as Country))
+    .filter((p) => !!p);
+
   return Array.from({
     length: 159 /* nb countries + 2 */,
   }).reduce<Record<number, ICellInfo>>((acc, _, i) => {

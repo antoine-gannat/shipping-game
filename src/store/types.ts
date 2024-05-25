@@ -20,4 +20,4 @@ export type StoreEventPayload<T extends StoreEvent> = T extends "changeScene"
 export type StoreEventHandler<T extends StoreEvent> = (
   store: IStore,
   payload: StoreEventPayload<T>
-) => IStore;
+) => Promise<IStore> | IStore;

@@ -4,7 +4,7 @@ import type { StoreEventHandler, StoreEvent } from "./types";
 import { createWorldCellInfo, worldCells } from "./world";
 
 export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
-  changeScene: (store, { sceneKind }) => {
+  changeScene: async (store, { sceneKind }) => {
     switch (sceneKind) {
       case "port":
         // TODO: fetch from port DB
@@ -25,7 +25,7 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
           scene: {
             kind: "world",
             cells: worldCells,
-            cellsInfo: createWorldCellInfo(),
+            cellsInfo: await createWorldCellInfo(),
             defaultScale: CAMERA_MIN_SCALE,
             inventory: {},
           },
@@ -36,6 +36,10 @@ export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
     }
   },
   createDialog: (store, dialog) => {
+    if (store.dialogs.find((d) => d.title === dialog.title)) {
+      console.warn("Dialog already exists", dialog.title);
+      return store;
+    }
     return {
       ...store,
       dialogs: [...store.dialogs, dialog],

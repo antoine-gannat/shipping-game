@@ -2,14 +2,16 @@ import * as PIXI from "pixi.js";
 import { app } from "../Pixi";
 import { Cell } from "./components/Cell";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE, CELL_SIZE } from "./constants";
-import { CellType, IPosition, IShip } from "../types";
+import { CellType, DeepReadonly, IPosition, IShip } from "../types";
 import { cellPositionToScreenPosition } from "./utils/cellPosition";
 import { addHoverStyling } from "./utils/addHoverStyling";
-import { dispatch, getStore, subscribe } from "../store";
+import { dispatch, subscribe } from "../store";
 import { getCountryFromId } from "../store/world";
+import { IStore } from "../store/types";
 
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
+  private store: DeepReadonly<IStore>;
   constructor() {
     // set default scale
     app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 15;
@@ -25,6 +27,7 @@ class Game {
         // only re-render if we change scene
         return;
       }
+      this.store = newStore;
       // clear the stage
       app.stage.removeChildren();
       if (newStore.scene.defaultScale) {
@@ -148,8 +151,7 @@ class Game {
   }
 
   private drawMapElement(kind: CellType, row: number, column: number) {
-    const store = getStore();
-    const cellInfo = store.scene.cellsInfo[kind as CellType];
+    const cellInfo = this.store.scene.cellsInfo[kind as CellType];
 
     // if no render information is given, don't render anything
     if (!cellInfo.asset && !cellInfo.cellColor) {
@@ -161,9 +163,9 @@ class Game {
     };
     // calculate if the cell has neighbors, if not, we'll render the sides
     const hasLeftNeighbor =
-      store.scene.cells[position.y + 1]?.[position.x] === kind;
+      this.store.scene.cells[position.y + 1]?.[position.x] === kind;
     const hasRightNeighbor =
-      store.scene.cells[position.y]?.[position.x + 1] === kind;
+      this.store.scene.cells[position.y]?.[position.x + 1] === kind;
 
     let cell: Cell;
     // create the cell
@@ -200,12 +202,12 @@ class Game {
       addHoverStyling(cell.element);
       cell.element.on("click", (e) => {
         dispatch("createDialog", {
-          title: "Country info",
+          title: getCountryFromId(kind),
           position: e.client,
           content: [
             {
               kind: "button",
-              text: getCountryFromId(kind),
+              text: "Visit port",
               onClick: () => {
                 dispatch("changeScene", { sceneKind: "port" });
               },

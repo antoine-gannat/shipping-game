@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@pixi/filter-color-overlay": "^5.1.1",
+    "dexie": "^4.0.4",
     "pixi.js": "^7.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
