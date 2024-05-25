@@ -32,7 +32,6 @@ export function App() {
       .equals("true")
       .count()
       .then((ownedPortsCount) => {
-        console.log(ownedPortsCount);
         if (ownedPortsCount === 0) {
           setIsNewPlayer(true);
         }
