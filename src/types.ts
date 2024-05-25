@@ -19,23 +19,6 @@ export interface ICellInfo {
 
 export type CellType = number;
 
-interface IBaseScene<K extends string> {
-  kind: K;
-  cells: CellType[][];
-  // Defines what each cell type looks like.
-  cellsInfo: Record<CellType, ICellInfo>;
-  defaultScale?: number;
-  defaultPosition?: number;
-}
-
-export interface IPortScene extends IBaseScene<"port"> {
-  ships: IShip[];
-}
-
-export interface IWorldScene extends IBaseScene<"world"> {
-  // TODO: add world scene properties
-}
-
 // Utils
 
 export type DeepReadonly<T> = Readonly<{

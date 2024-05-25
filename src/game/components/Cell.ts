@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import { IPosition } from "../../types";
+import { CellType, DeepReadonly, ICellInfo, IPosition } from "../../types";
 import { CELL_SIZE, MAGIC_X_POSITION_MULTIPLIER } from "../constants";
 import { shadeColor } from "../utils/shadeColor";
 import { degToRad } from "../utils/degrees";
@@ -17,10 +17,18 @@ export class Cell {
   constructor(
     position: IPosition,
     color: string,
-    hasLeftNeighbor: boolean,
-    hasRightNeighbor: boolean
+    // used to calculate neighbors
+    cells: DeepReadonly<CellType[][]>,
+    cellsInfo: DeepReadonly<Record<CellType, ICellInfo>>
   ) {
     this.element = new Container();
+    // calculate if the cell has neighbors, if not, we'll render the sides
+
+    // We concider the cell has a neighbor if said cell has a color
+    const hasLeftNeighbor =
+      !!cellsInfo[cells[position.y + 1]?.[position.x]]?.cellColor;
+    const hasRightNeighbor =
+      !!cellsInfo[[position.y]?.[position.x + 1]]?.cellColor;
 
     const topSide = new Graphics();
     const height = CELL_SIZE / 2;
