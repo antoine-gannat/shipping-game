@@ -49,7 +49,6 @@ export class WorldRenderer implements ISceneRenderer<IWorldScene> {
         }
       });
     });
-    console.log(app.stage.children.length);
   }
 
   private addCellInteractivity(cell: Cell, cellType: CellType) {

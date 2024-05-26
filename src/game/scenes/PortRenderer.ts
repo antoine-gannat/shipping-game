@@ -85,17 +85,6 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
         }
       });
     });
-    // const position = { x: 6, y: 3 };
-    // const cell = new Cell(
-    //   position,
-    //   "#ff0000",
-    //   scene.cells,
-    //   scene.cellsInfo,
-    //   true
-    // );
-    // app.stage.addChild(cell.element);
-
-    console.log(app.stage.children.length);
   }
 
   // To improve performances, merge 4 cells into one
