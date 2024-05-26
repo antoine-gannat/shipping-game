@@ -68,7 +68,7 @@ export class Cell {
       rightSide.endFill();
       rightSide.position = {
         x: size * MAGIC_X_POSITION_MULTIPLIER, // TODO: magic number
-        y: doubleSize ? size * 0.75 : size, // TODO: magic number
+        y: doubleSize ? size - CELL_SIZE / 2 : size,
       };
       rightSide.skew = { x: 0, y: -degToRad(30 /* degrees */) };
     }
