@@ -54,7 +54,7 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
         };
         const cell = new Cell(
           position,
-          shouldRenderMergedCell ? "#ff0000" : cellInfo.cellColor,
+          cellInfo.cellColor,
           scene.cells,
           scene.cellsInfo,
           shouldRenderMergedCell
