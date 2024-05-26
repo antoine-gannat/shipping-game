@@ -1,6 +1,6 @@
 import type { DeepReadonly } from "../types";
 import { createDefaultStore } from "./default";
-import { handlers } from "./handlers";
+import { reducers } from "./reducers";
 import type { IStore, StoreEvent, StoreEventPayload } from "./types";
 
 type StoreListener = (
@@ -45,17 +45,17 @@ export function subscribe(listener: StoreListener): () => void {
 
 export async function dispatch<E extends StoreEvent>(
   eventType: E,
-  payload: StoreEventPayload<E>
+  payload: StoreEventPayload[E]
 ): Promise<DeepReadonly<IStore>> {
   const promise = new Promise<IStore>((resolve) => {
     // dispatch the event in the next tick, this helps with concurrency issues
     setTimeout(async () => {
       const previousStore = await getStore();
-      if (!handlers[eventType]) {
-        console.error("Unknown event type", eventType);
+      if (!reducers[eventType]) {
+        console.error("No reducer found for event type", eventType);
         return previousStore;
       }
-      const newStore = await handlers[eventType](
+      const newStore = await reducers[eventType](
         previousStore as IStore,
         payload
       );
@@ -66,9 +66,3 @@ export async function dispatch<E extends StoreEvent>(
   });
   return promise;
 }
-
-/**
- * 1. Dispatch an event to modify the store
- * 2. Make sure the events are queued and processed in order
- *
- */

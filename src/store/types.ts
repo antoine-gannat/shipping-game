@@ -14,21 +14,17 @@ export type StoreEvent =
   | "removeDialog"
   | "buyPort";
 
-export type StoreEventPayload<T extends StoreEvent> = T extends "visitPort"
-  ? { portName: string }
-  : T extends "viewWorld"
-  ? {}
-  : T extends "createDialog"
-  ? IDialog
-  : T extends "removeDialog"
-  ? IDialog
-  : T extends "buyPort"
-  ? { portName: string }
-  : never;
+export type StoreEventPayload = {
+  visitPort: { portName: string };
+  buyPort: { portName: string };
+  viewWorld: {};
+  createDialog: IDialog;
+  removeDialog: IDialog;
+};
 
-export type StoreEventHandler<T extends StoreEvent> = (
+export type StoreReducer<E extends StoreEvent> = (
   store: IStore,
-  payload: StoreEventPayload<T>
+  payload: StoreEventPayload[E]
 ) => Promise<IStore> | IStore;
 
 // Scenes //

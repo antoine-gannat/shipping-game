@@ -1,10 +1,10 @@
 import { db } from "../database";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE } from "../game/constants";
 import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
-import type { StoreEventHandler, StoreEvent } from "./types";
+import type { StoreReducer, StoreEvent } from "./types";
 import { createWorldCellInfo, worldCells } from "./world";
 
-export const handlers: { [E in StoreEvent]: StoreEventHandler<E> } = {
+export const reducers: { [E in StoreEvent]: StoreReducer<E> } = {
   viewWorld: async (store) => {
     return {
       ...store,
