@@ -15,12 +15,15 @@ export class Cell {
   };
 
   constructor(
-    position: IPosition,
+    pos: IPosition,
     color: string,
     // used to calculate neighbors
     cells: DeepReadonly<CellType[][]>,
-    cellsInfo: DeepReadonly<Record<CellType, ICellInfo>>
+    cellsInfo: DeepReadonly<Record<CellType, ICellInfo>>,
+    doubleSize = false
   ) {
+    const position = doubleSize ? { x: pos.x, y: pos.y + 1 } : pos;
+    const size = doubleSize ? CELL_SIZE * 2 : CELL_SIZE;
     this.element = new Container();
     // calculate if the cell has neighbors, if not, we'll render the sides
 
@@ -28,14 +31,14 @@ export class Cell {
     const hasLeftNeighbor =
       !!cellsInfo[cells[position.y + 1]?.[position.x]]?.cellColor;
     const hasRightNeighbor =
-      !!cellsInfo[[position.y]?.[position.x + 1]]?.cellColor;
+      !!cellsInfo[cells[position.y]?.[position.x + 1]]?.cellColor;
 
     const topSide = new Graphics();
     const height = CELL_SIZE / 2;
     const sidePosition = { x: 0, y: CELL_SIZE / 2 };
 
     topSide.beginFill(color);
-    topSide.drawRect(0, 0, CELL_SIZE, CELL_SIZE);
+    topSide.drawRect(0, 0, size, size);
     topSide.endFill();
     topSide.position = sidePosition;
     topSide.skew = {
@@ -44,11 +47,11 @@ export class Cell {
     };
 
     let leftSide: Graphics;
-    if (!hasLeftNeighbor) {
+    if (!hasLeftNeighbor || doubleSize) {
       leftSide = new Graphics();
 
       leftSide.beginFill(shadeColor(color, -20));
-      leftSide.drawRect(0, 0, height, CELL_SIZE);
+      leftSide.drawRect(0, 0, height, size);
       leftSide.endFill();
       leftSide.position = sidePosition;
       leftSide.skew = {
@@ -58,14 +61,14 @@ export class Cell {
     }
 
     let rightSide: Graphics;
-    if (!hasRightNeighbor) {
+    if (!hasRightNeighbor || doubleSize) {
       rightSide = new Graphics();
       rightSide.beginFill(shadeColor(color, -30));
-      rightSide.drawRect(0, 0, CELL_SIZE, height);
+      rightSide.drawRect(0, 0, size, height);
       rightSide.endFill();
       rightSide.position = {
-        x: CELL_SIZE * MAGIC_X_POSITION_MULTIPLIER,
-        y: CELL_SIZE,
+        x: size * MAGIC_X_POSITION_MULTIPLIER, // TODO: magic number
+        y: doubleSize ? size * 0.75 : size, // TODO: magic number
       };
       rightSide.skew = { x: 0, y: -degToRad(30 /* degrees */) };
     }

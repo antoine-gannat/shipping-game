@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createUseStyles } from "react-jss";
 import { IStore } from "../store/types";
-import { access, subscribe } from "../store";
+import { access, dispatch, subscribe } from "../store";
 import { Navbar } from "./Components/Navbar/Navbar";
 import { IBaseProps, IDialog } from "./types";
 import { Dialog } from "./Components/Dialog/Dialog";
@@ -25,6 +25,7 @@ export function App() {
 
   React.useEffect(() => {
     access("getIsNewPlayer").then(setIsNewPlayer);
+    dispatch("visitPort", { portName: "port1" });
 
     // listen for store changes and return cleanup fct
     return subscribe((_, newStore) => setStore(newStore));
