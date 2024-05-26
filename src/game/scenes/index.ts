@@ -9,10 +9,7 @@ const sceneRenderers: Record<string, ISceneRenderer> = {
   port: new PortRenderer(),
 };
 
-export function renderScene(
-  scene: DeepReadonly<IBaseScene>,
-  store: DeepReadonly<IStore>
-) {
+export function renderScene(scene: DeepReadonly<IBaseScene>, store: IStore) {
   const sceneRenderer = sceneRenderers[scene.kind];
   if (!sceneRenderer) {
     throw new Error(`No renderer for scene kind ${scene.kind}`);

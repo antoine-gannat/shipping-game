@@ -1,13 +1,18 @@
-import type { DeepReadonly } from "../types";
+import { accessors } from "./accessors";
 import { createDefaultStore } from "./default";
 import { reducers } from "./reducers";
-import type { IStore, StoreEvent, StoreEventPayload } from "./types";
+import type {
+  IStore,
+  StoreAccessorEvent,
+  StoreReducerEvent,
+  StoreReducerPayload,
+} from "./types";
 
 type StoreListener = (
   // The previous state of the store, null if this is the first call
-  prevStore: DeepReadonly<IStore> | null,
+  prevStore: IStore | null,
   // The new state of the store
-  newStore: DeepReadonly<IStore>
+  newStore: IStore
 ) => void;
 
 // List of subscribers to the store
@@ -20,7 +25,7 @@ function setStore(newStore: IStore) {
   store = newStore;
 }
 
-export async function getStore(): Promise<DeepReadonly<IStore>> {
+export async function getStore(): Promise<IStore> {
   if (!store) {
     store = await createDefaultStore();
   }
@@ -43,10 +48,10 @@ export function subscribe(listener: StoreListener): () => void {
   };
 }
 
-export async function dispatch<E extends StoreEvent>(
+export async function dispatch<E extends StoreReducerEvent>(
   eventType: E,
-  payload: StoreEventPayload[E]
-): Promise<DeepReadonly<IStore>> {
+  payload: StoreReducerPayload[E]
+): Promise<IStore> {
   const promise = new Promise<IStore>((resolve) => {
     // dispatch the event in the next tick, this helps with concurrency issues
     setTimeout(async () => {
@@ -55,14 +60,20 @@ export async function dispatch<E extends StoreEvent>(
         console.error("No reducer found for event type", eventType);
         return previousStore;
       }
-      const newStore = await reducers[eventType](
-        previousStore as IStore,
-        payload
-      );
+      const newStore = await reducers[eventType](previousStore, payload);
       subscriptions.forEach((listener) => listener(previousStore, newStore));
       setStore(newStore);
       resolve(newStore);
     }, 0);
   });
   return promise;
+}
+
+export async function access<E extends StoreAccessorEvent>(eventType: E) {
+  const currentStore = await getStore();
+  if (!accessors[eventType]) {
+    console.error("No accessor found for event type", eventType);
+    return null;
+  }
+  return accessors[eventType](currentStore);
 }

@@ -1,10 +1,11 @@
 import { db } from "../database";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE } from "../game/constants";
 import { PORT_A_CELLS, PORT_A_CELLS_INFO } from "./constants";
-import type { StoreReducer, StoreEvent } from "./types";
+import type { StoreReducer, StoreReducerEvent } from "./types";
 import { createWorldCellInfo, worldCells } from "./world";
 
-export const reducers: { [E in StoreEvent]: StoreReducer<E> } = {
+// Reducers, they are used to modify the store and database.
+export const reducers: { [E in StoreReducerEvent]: StoreReducer<E> } = {
   viewWorld: async (store) => {
     return {
       ...store,

@@ -1,13 +1,13 @@
 import { app } from "../Pixi";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE } from "./constants";
-import { DeepReadonly, IPosition } from "../types";
+import { IPosition } from "../types";
 import { subscribe } from "../store";
 import { IStore } from "../store/types";
 import { renderScene } from "./scenes";
 
 class Game {
   private lastClick: IPosition = { x: -1, y: -1 };
-  private store: DeepReadonly<IStore>;
+  private store: IStore;
   constructor() {
     // set default scale
     app.stage.scale.x = app.stage.scale.y = CAMERA_MIN_SCALE * 15;
