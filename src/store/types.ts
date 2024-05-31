@@ -1,5 +1,11 @@
 import { IDialog } from "../react/types";
-import type { CellType, DeepReadonly, ICellInfo, IShip } from "../types";
+import type {
+  CellType,
+  DeepReadonly,
+  ICellInfo,
+  IPosition,
+  IShip,
+} from "../types";
 
 // --- Store --- //
 
@@ -18,6 +24,7 @@ export type StoreReducerEvent =
   | "visitPort"
   | "viewWorld"
   | "createDialog"
+  | "createCountryDialog"
   | "removeDialog"
   | "buyPort";
 
@@ -26,6 +33,7 @@ export type StoreReducerPayload = {
   buyPort: { portName: string };
   viewWorld: {};
   createDialog: IDialog;
+  createCountryDialog: { countryName: string; position: IPosition };
   removeDialog: IDialog;
 };
 

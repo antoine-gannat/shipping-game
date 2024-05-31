@@ -56,31 +56,7 @@ export class WorldRenderer implements ISceneRenderer<IWorldScene> {
     const countryName = getCountryFromId(countryId);
     addHoverStyling(cell.element);
     cell.element.on("click", (e) => {
-      dispatch("createDialog", {
-        title: countryName,
-        position: e.client,
-        content: [
-          {
-            kind: "button",
-            text: "Buy port",
-            onClick: () => {
-              // buy and then visit the port
-              dispatch("buyPort", { portName: countryName }).then(() => {
-                dispatch("visitPort", { portName: countryName });
-              });
-            },
-            closeOnClick: true,
-          },
-          {
-            kind: "button",
-            text: "Visit port",
-            onClick: () => {
-              dispatch("visitPort", { portName: countryName });
-            },
-            closeOnClick: true,
-          },
-        ],
-      });
+      dispatch("createCountryDialog", { countryName, position: e.client });
     });
   }
 
