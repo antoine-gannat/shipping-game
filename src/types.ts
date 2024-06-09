@@ -30,3 +30,5 @@ export type DeepReadonly<T> = Readonly<{
     : // It is some other object, make it readonly as well
       DeepReadonly<T[K]>;
 }>;
+
+export type ID = number;

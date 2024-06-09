@@ -1,21 +1,23 @@
-type ID = number;
+import type { ID } from "../types";
 
 export interface IDbPort {
   id?: ID;
   name: string;
   owned: "true" | "false";
+  // id of ships that are currently docked at this port
+  ships: ID[];
 }
 
 export interface IDbShip {
-  id: ID;
+  id?: ID;
   name: string;
-  type: string;
+  type: "cargo-small" | "cargo-large";
   portId?: ID;
   journeyId?: ID;
 }
 
 export interface IDbJourney {
-  id: ID;
+  id?: ID;
   shipId: ID;
   originPortId: ID;
   destinationPortId: ID;

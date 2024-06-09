@@ -1,12 +1,13 @@
 import { Dexie, Table } from "dexie";
 import { IDbJourney, IDbPort, IDbShip } from "./types";
+import { ID } from "../types";
 
 const CURRENT_DB_VERSION = 1;
 
 class Database extends Dexie {
-  ships!: Table<IDbShip>;
-  ports!: Table<IDbPort>;
-  journeys!: Table<IDbJourney>;
+  ships!: Table<IDbShip, ID>;
+  ports!: Table<IDbPort, ID>;
+  journeys!: Table<IDbJourney, ID>;
   constructor() {
     super("shipping-game-db");
     this.initializeStores();

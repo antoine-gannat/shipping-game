@@ -3,6 +3,7 @@ import type {
   CellType,
   DeepReadonly,
   ICellInfo,
+  ID,
   IPosition,
   IShip,
 } from "../types";
@@ -26,6 +27,7 @@ export type StoreReducerEvent =
   | "createDialog"
   | "createCountryDialog"
   | "removeDialog"
+  | "newJourney"
   | "buyPort";
 
 export type StoreReducerPayload = {
@@ -35,6 +37,7 @@ export type StoreReducerPayload = {
   createDialog: IDialog;
   createCountryDialog: { countryName: string; position: IPosition };
   removeDialog: IDialog;
+  newJourney: { shipId: ID; destination: string };
 };
 
 export type StoreReducer<E extends StoreReducerEvent> = (
@@ -66,8 +69,8 @@ export interface IBaseScene<K extends string = string> {
 }
 
 export interface IPortScene extends IBaseScene<"port"> {
-  ships: IShip[];
   portName: string;
+  ships: IShip[];
 }
 
 export interface IWorldScene extends IBaseScene<"world"> {
