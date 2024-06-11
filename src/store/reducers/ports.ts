@@ -1,10 +1,9 @@
+import { access } from "..";
 import { db } from "../../database";
 import { StoreReducer } from "../types";
 
 export const buyPort: StoreReducer<"buyPort"> = async (store, { portName }) => {
-  const isFirstPort = !!!(await db.ports
-    .filter((o) => o.owned === "true")
-    .count());
+  const isFirstPort = await access("getIsNewPlayer");
 
   // get the port id
   const port = await db.ports.get({ name: portName });
