@@ -5,7 +5,6 @@ export const buyPort: StoreReducer<"buyPort"> = async (store, { portName }) => {
   const isFirstPort = !!!(await db.ports
     .filter((o) => o.owned === "true")
     .count());
-  console.log({ isFirstPort });
 
   // get the port id
   const port = await db.ports.get({ name: portName });
