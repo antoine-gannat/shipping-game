@@ -4,20 +4,28 @@ export interface IBaseProps {
   store: IStore;
 }
 
-export interface IDialogContentText {
+export interface IContentText {
   kind: "text";
   text: string;
 }
 
-export interface IDialogContentButton {
+export interface IContentButton {
   kind: "button";
   text: string;
   onClick: () => void;
   closeOnClick?: boolean;
 }
 
+export interface IContentDropdownWithButton {
+  kind: "dropdown-with-button";
+  text: string;
+  onClick: (dropdownValue: string) => void;
+  dropdownContent: string[];
+  closeOnClick?: boolean;
+}
+
 export interface IDialog {
   position: { x: number; y: number };
   title: string;
-  content: Array<IDialogContentButton | IDialogContentText>;
+  content: Array<IContentButton | IContentText | IContentDropdownWithButton>;
 }

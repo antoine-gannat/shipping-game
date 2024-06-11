@@ -26,6 +26,7 @@ export type StoreReducerEvent =
   | "viewWorld"
   | "createDialog"
   | "createCountryDialog"
+  | "createShipDialog"
   | "removeDialog"
   | "newJourney"
   | "buyPort";
@@ -35,7 +36,8 @@ export type StoreReducerPayload = {
   buyPort: { portName: string };
   viewWorld: {};
   createDialog: IDialog;
-  createCountryDialog: { countryName: string; position: IPosition };
+  createCountryDialog: { countryName: string; dialogPosition: IPosition };
+  createShipDialog: { shipId: ID; dialogPosition: IPosition };
   removeDialog: IDialog;
   newJourney: { shipId: ID; destination: string };
 };

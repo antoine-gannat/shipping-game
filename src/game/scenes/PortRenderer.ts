@@ -159,10 +159,9 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
     if (ship.static) {
       addHoverStyling(shipSprite);
       shipSprite.on("click", (e) => {
-        dispatch("createDialog", {
-          title: `Ship ${ship.id} info`,
-          position: e.client,
-          content: [{ kind: "text", text: "This is a ship" }],
+        dispatch("createShipDialog", {
+          shipId: ship.id,
+          dialogPosition: e.client,
         });
       });
     }

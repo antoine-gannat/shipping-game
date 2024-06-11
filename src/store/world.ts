@@ -163,6 +163,8 @@ const countries = [
   "Australia",
 ] as const;
 
+export const countriesSorted = countries.slice(1).sort();
+
 type Country = (typeof countries)[number];
 
 export function getCountryFromId(id: number) {
@@ -172,7 +174,7 @@ export function getCountryFromId(id: number) {
 // Create a world cell info object with the countries and their colors
 export async function createWorldCellInfo() {
   const ownedCountries = (await db.ports.toArray())
-    .map((p) => p.owned && (p.name as Country))
+    .map((p) => p.owned === "true" && (p.name as Country))
     .filter((p) => !!p);
 
   return Array.from({

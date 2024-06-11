@@ -60,7 +60,8 @@ export async function dispatch<E extends StoreReducerEvent>(
         console.error("No reducer found for event type", eventType);
         return previousStore;
       }
-      const newStore = await reducers[eventType](previousStore, payload);
+      const newStore =
+        (await reducers[eventType](previousStore, payload)) || previousStore;
       subscriptions.forEach((listener) => listener(previousStore, newStore));
       setStore(newStore);
       resolve(newStore);
