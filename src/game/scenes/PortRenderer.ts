@@ -73,12 +73,8 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
           if (cellInfo.isInteractive) {
             addHoverStyling(sprite);
 
-            sprite.on("click", (e) => {
-              dispatch("createDialog", {
-                title: "Building 1",
-                position: e.client,
-                content: [{ kind: "text", text: "This is a building" }],
-              });
+            sprite.on("click", () => {
+              // no-op
             });
           }
           app.stage.addChild(sprite);

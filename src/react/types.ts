@@ -1,30 +1,30 @@
 import { IStore } from "../store/types";
+import { ID } from "../types";
 
 export interface IBaseProps {
   store: IStore;
 }
 
-export interface IContentText {
-  kind: "text";
+interface IBaseContent<K> {
+  kind: K;
   text: string;
+  onClick?: (value?: string) => void;
 }
 
-export interface IContentButton {
-  kind: "button";
-  text: string;
+export interface IContentText extends IBaseContent<"text"> {}
+
+export interface IContentButton extends IBaseContent<"button"> {
   onClick: () => void;
-  closeOnClick?: boolean;
 }
 
-export interface IContentDropdownWithButton {
-  kind: "dropdown-with-button";
-  text: string;
+export interface IContentDropdownWithButton
+  extends IBaseContent<"dropdown-with-button"> {
   onClick: (dropdownValue: string) => void;
   dropdownContent: string[];
-  closeOnClick?: boolean;
 }
 
 export interface IDialog {
+  id: ID;
   position: { x: number; y: number };
   title: string;
   content: Array<IContentButton | IContentText | IContentDropdownWithButton>;

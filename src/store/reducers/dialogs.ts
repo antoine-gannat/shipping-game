@@ -1,6 +1,7 @@
-import { dispatch } from "..";
+import { __internalDispatch, dispatch } from "..";
 import { db } from "../../database";
 import { IDialog } from "../../react/types";
+import { uniqueId } from "../../utils/uniqueId";
 import { StoreReducer } from "../types";
 import { countriesSorted } from "../world";
 
@@ -9,15 +10,16 @@ export const createCountryDialog: StoreReducer<"createCountryDialog"> = async (
   { countryName, dialogPosition }
 ) => {
   const isOwned = (await db.ports.get({ name: countryName }))?.owned === "true";
+  const id = uniqueId();
   const content: IDialog["content"] = isOwned
     ? [
         {
           kind: "button",
           text: "Visit port",
           onClick: () => {
+            dispatch("removeDialog", { dialogId: id });
             dispatch("visitPort", { portName: countryName });
           },
-          closeOnClick: true,
         },
       ]
     : [];
@@ -26,14 +28,13 @@ export const createCountryDialog: StoreReducer<"createCountryDialog"> = async (
       kind: "button",
       text: "Buy port",
       onClick: () => {
-        dispatch("buyPort", { portName: countryName }).then(() => {
-          dispatch("visitPort", { portName: countryName });
-        });
+        dispatch("buyPort", { portName: countryName });
+        dispatch("visitPort", { portName: countryName });
       },
-      closeOnClick: true,
     });
   }
-  return dispatch("createDialog", {
+  return __internalDispatch("addDialog", {
+    id,
     title: countryName,
     position: dialogPosition,
     content,
@@ -49,27 +50,29 @@ export const createShipDialog: StoreReducer<"createShipDialog"> = async (
     console.warn("Ship not found", shipId);
     return;
   }
+  const id = uniqueId();
   const content: IDialog["content"] = [
     {
       kind: "dropdown-with-button",
       text: "New journey",
       onClick: (destination) => {
+        dispatch("removeDialog", { dialogId: id });
         dispatch("newJourney", { shipId, destination });
       },
       dropdownContent: countriesSorted,
-      closeOnClick: true,
     },
   ];
-  return dispatch("createDialog", {
+  return __internalDispatch("addDialog", {
+    id,
     title: ship.name,
     position: dialogPosition,
     content,
   });
 };
 
-export const createDialog: StoreReducer<"createDialog"> = (store, dialog) => {
-  if (store.dialogs.find((d) => d.title === dialog.title)) {
-    console.warn("Dialog already exists", dialog.title);
+export const addDialog: StoreReducer<"addDialog"> = (store, dialog) => {
+  if (store.dialogs.find((d) => d.id === dialog.id)) {
+    console.warn("A Dialog with that ID already exists", dialog.id);
     return store;
   }
   return {
@@ -78,9 +81,12 @@ export const createDialog: StoreReducer<"createDialog"> = (store, dialog) => {
   };
 };
 
-export const removeDialog: StoreReducer<"removeDialog"> = (store, dialog) => {
+export const removeDialog: StoreReducer<"removeDialog"> = (
+  store,
+  { dialogId }
+) => {
   return {
     ...store,
-    dialogs: store.dialogs.filter((d) => d !== dialog),
+    dialogs: store.dialogs.filter((d) => d.id !== dialogId),
   };
 };

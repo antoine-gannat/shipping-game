@@ -24,10 +24,10 @@ export type IStore = DeepReadonly<IWritableStore>;
 export type StoreReducerEvent =
   | "visitPort"
   | "viewWorld"
-  | "createDialog"
+  | "addDialog"
+  | "removeDialog"
   | "createCountryDialog"
   | "createShipDialog"
-  | "removeDialog"
   | "newJourney"
   | "journeyEnd"
   | "buyPort";
@@ -36,10 +36,10 @@ export type StoreReducerPayload = {
   visitPort: { portName: string };
   buyPort: { portName: string };
   viewWorld: {};
-  createDialog: IDialog;
+  addDialog: IDialog;
+  removeDialog: { dialogId: ID };
   createCountryDialog: { countryName: string; dialogPosition: IPosition };
   createShipDialog: { shipId: ID; dialogPosition: IPosition };
-  removeDialog: IDialog;
   newJourney: { shipId: ID; destination: string };
   journeyEnd: { journeyId: ID };
 };

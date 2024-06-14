@@ -8,8 +8,6 @@ import {
 } from "../../types";
 import { dispatch } from "../../../store";
 
-type WithCloseCallback<T> = T & { closeDialog: () => void };
-
 const useStyles = createUseStyles({
   root: {
     width: "auto",
@@ -39,9 +37,7 @@ const useStyles = createUseStyles({
   },
 });
 
-function TextContent({
-  text,
-}: WithCloseCallback<IContentText>): React.ReactElement {
+function TextContent({ text }: IContentText): React.ReactElement {
   return <p>{text}</p>;
 }
 
@@ -49,17 +45,9 @@ function DropdownContent({
   onClick,
   text,
   dropdownContent,
-  closeDialog,
-  closeOnClick,
-}: WithCloseCallback<IContentDropdownWithButton>): React.ReactElement {
+}: IContentDropdownWithButton): React.ReactElement {
   const selectRef = React.useRef<HTMLSelectElement>(null);
-  const onClickHandler = () => {
-    onClick(selectRef.current.value);
-    if (closeOnClick) {
-      console.log("close dropdown");
-      closeDialog();
-    }
-  };
+
   return (
     <div>
       <select ref={selectRef}>
@@ -67,29 +55,18 @@ function DropdownContent({
           <option key={i}>{c}</option>
         ))}
       </select>
-      <button onClick={onClickHandler}>{text}</button>
+      <button onClick={() => onClick(selectRef.current.value)}>{text}</button>
     </div>
   );
 }
 
-function ButtonContent({
-  text,
-  onClick,
-  closeDialog,
-  closeOnClick,
-}: WithCloseCallback<IContentButton>): React.ReactElement {
-  const onClickHandler = () => {
-    onClick();
-    if (closeOnClick) {
-      closeDialog();
-    }
-  };
-  return <button onClick={onClickHandler}>{text}</button>;
+function ButtonContent({ text, onClick }: IContentButton): React.ReactElement {
+  return <button onClick={onClick}>{text}</button>;
 }
 
 const componentMap: Record<
   IDialog["content"][0]["kind"],
-  React.ComponentType<WithCloseCallback<any>>
+  React.ComponentType<any>
 > = {
   button: ButtonContent,
   "dropdown-with-button": DropdownContent,
@@ -101,11 +78,6 @@ export function Dialog({ dialog }: { dialog: IDialog }): React.ReactElement {
   const lastClickPosRef = React.useRef<{ x: number; y: number }>();
   const initalClickOffset = React.useRef<{ x: number; y: number }>();
   const styles = useStyles();
-
-  const closeDialog = React.useCallback(
-    () => dispatch("removeDialog", dialog),
-    [dialog]
-  );
 
   const onMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
@@ -148,12 +120,13 @@ export function Dialog({ dialog }: { dialog: IDialog }): React.ReactElement {
         <h1>{dialog.title}</h1>
         {dialog.content.map((c, i) => {
           const Component = componentMap[c.kind];
-          return (
-            Component && <Component key={i} closeDialog={closeDialog} {...c} />
-          );
+          return Component && <Component key={i} {...c} />;
         })}
       </div>
-      <button className={styles.button} onClick={closeDialog}>
+      <button
+        className={styles.button}
+        onClick={() => dispatch("removeDialog", { dialogId: dialog.id })}
+      >
         X
       </button>
     </div>
