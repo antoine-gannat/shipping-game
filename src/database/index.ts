@@ -1,5 +1,5 @@
 import { Dexie, Table } from "dexie";
-import { IDbJourney, IDbPort, IDbShip } from "./types";
+import { IDbJourney, IDbPort, IDbShip, IDbTimer } from "./types";
 import { ID } from "../types";
 import { countriesSorted } from "../store/world";
 
@@ -9,6 +9,7 @@ class Database extends Dexie {
   ships!: Table<IDbShip, ID>;
   ports!: Table<IDbPort, ID>;
   journeys!: Table<IDbJourney, ID>;
+  timers!: Table<IDbTimer, ID>;
   constructor() {
     super("shipping-game-db");
   }
@@ -24,8 +25,10 @@ class Database extends Dexie {
       ports: "++id, name, owned",
       journeys:
         "++id, shipId, originPortId, destinationPortId, departureTime, duration",
+      timers: "++id, startTime, endTime, action, actionProperties",
     });
   }
+
   private async populateDB() {
     const alreadyPopulated = (await this.ports.count()) > 0;
     if (alreadyPopulated) {

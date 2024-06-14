@@ -29,6 +29,7 @@ export type StoreReducerEvent =
   | "createShipDialog"
   | "removeDialog"
   | "newJourney"
+  | "journeyEnd"
   | "buyPort";
 
 export type StoreReducerPayload = {
@@ -40,6 +41,7 @@ export type StoreReducerPayload = {
   createShipDialog: { shipId: ID; dialogPosition: IPosition };
   removeDialog: IDialog;
   newJourney: { shipId: ID; destination: string };
+  journeyEnd: { journeyId: ID };
 };
 
 export type StoreReducer<E extends StoreReducerEvent> = (

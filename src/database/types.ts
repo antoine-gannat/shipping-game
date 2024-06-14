@@ -24,3 +24,11 @@ export interface IDbJourney {
   departureTime: number;
   duration: number;
 }
+
+export interface IDbTimer {
+  id?: ID;
+  startTime: number;
+  endTime: number;
+  action: string;
+  actionProperties: Record<string, string | number>;
+}
