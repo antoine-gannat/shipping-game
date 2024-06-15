@@ -1,7 +1,7 @@
 import { __internalDispatch, dispatch } from "..";
 import { db } from "../../database";
 import { IDialog } from "../../react/types";
-import { uniqueId } from "../../utils/uniqueId";
+import { uniqueRuntimeId } from "../../utils/uniqueRuntimeId";
 import { StoreReducer } from "../types";
 import { countriesSorted } from "../world";
 
@@ -10,7 +10,7 @@ export const createCountryDialog: StoreReducer<"createCountryDialog"> = async (
   { countryName, dialogPosition }
 ) => {
   const isOwned = (await db.ports.get({ name: countryName }))?.owned === "true";
-  const id = uniqueId();
+  const id = uniqueRuntimeId();
   const content: IDialog["content"] = isOwned
     ? [
         {
@@ -50,7 +50,7 @@ export const createShipDialog: StoreReducer<"createShipDialog"> = async (
     console.warn("Ship not found", shipId);
     return;
   }
-  const id = uniqueId();
+  const id = uniqueRuntimeId();
   const content: IDialog["content"] = [
     {
       kind: "dropdown-with-button",

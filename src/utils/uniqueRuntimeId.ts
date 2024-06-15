@@ -7,6 +7,6 @@ let index = 1;
  *
  * Note: This is a simple incrementing number.
  */
-export function uniqueId(): ID {
+export function uniqueRuntimeId(): ID {
   return index++;
 }
