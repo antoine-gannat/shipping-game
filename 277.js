@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkshipping_game=self.webpackChunkshipping_game||[]).push([[277],{1277:(e,p,s)=>{s.r(p),s(4687),s(7184),s(8713),s(9010),s(8540),s(2),s(3712),s(1709),s(1015),s(2092),s(9249)}}]);
