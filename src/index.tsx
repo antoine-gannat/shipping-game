@@ -16,8 +16,13 @@ async function main() {
   // init React
   createRoot(reactRoot).render(<App />);
 
+  // init Pixi
+  await app.init({
+    background: "#82C5F0",
+  });
+
   app.resizeTo = pixiRoot;
-  pixiRoot.appendChild(app.view);
+  pixiRoot.appendChild(app.canvas);
 
   // start game logic
   new Game();

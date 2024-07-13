@@ -34,9 +34,9 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "@pixi/filter-color-overlay": "^5.1.1",
+    "@pixi/gif": "^3.0.1",
     "dexie": "^4.0.4",
-    "pixi.js": "^7.3.3",
+    "pixi.js": "^8.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-jss": "^10.10.0"

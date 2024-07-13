@@ -71,7 +71,7 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
           sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
 
           if (cellInfo.isInteractive) {
-            addHoverStyling(sprite);
+            addHoverStyling(sprite, 0.9);
 
             sprite.on("click", () => {
               // no-op
@@ -119,7 +119,7 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
       ship.static ? 0 : 1
     );
 
-    const atlasData = {
+    const atlasData: PIXI.SpritesheetData = {
       frames,
       meta: {
         image: "assets/cargo-ship.png",
@@ -132,29 +132,27 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
       },
     };
 
+    const texture = await PIXI.Assets.load(atlasData.meta.image);
     // Create the SpriteSheet from data and image
-    const spritesheet = new PIXI.Spritesheet(
-      PIXI.BaseTexture.from(atlasData.meta.image),
-      atlasData
-    );
+    const spritesheet = new PIXI.Spritesheet(texture, atlasData);
 
     // Generate all the Textures asynchronously
     await spritesheet.parse();
 
     // spritesheet is ready to use!
-    const shipSprite = new PIXI.AnimatedSprite(spritesheet.animations.wave);
+    const shipAnimation = new PIXI.AnimatedSprite(spritesheet.animations.wave);
 
     // set the animation speed
-    shipSprite.animationSpeed = 0.05;
+    shipAnimation.animationSpeed = 0.05;
     // play the animation on a loop
-    shipSprite.play();
+    shipAnimation.play();
 
     const pos = cellPositionToScreenPosition(ship.position);
-    shipSprite.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
+    shipAnimation.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
     if (ship.static) {
-      addHoverStyling(shipSprite);
-      shipSprite.on("click", (e) => {
+      addHoverStyling(shipAnimation, 0.9);
+      shipAnimation.on("click", (e) => {
         dispatch("createShipDialog", {
           shipId: ship.id,
           dialogPosition: e.client,
@@ -162,9 +160,9 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
       });
     }
     // add it to the stage to render
-    app.stage.addChild(shipSprite);
+    app.stage.addChild(shipAnimation);
 
-    return shipSprite;
+    return shipAnimation;
   }
 
   private createFramesForAnimation(
@@ -172,8 +170,8 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
     frameSize: { width: number; height: number },
     frameCount = 4,
     frameStart = 0
-  ): PIXI.ISpritesheetData["frames"] {
-    const frames: PIXI.ISpritesheetData["frames"] = {};
+  ): PIXI.SpritesheetData["frames"] {
+    const frames: PIXI.SpritesheetData["frames"] = {};
 
     for (let i = frameStart; i < frameCount; i++) {
       frames[`${animationName}${i}`] = {
