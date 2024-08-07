@@ -1,9 +1,9 @@
-import { accessors } from "./accessors";
+import { getters } from "./getters";
 import { createDefaultStore } from "./default";
 import { reducers } from "./reducers";
 import type {
   IStore,
-  StoreAccessorEvent,
+  StoreGetterEvent,
   StoreReducerEvent,
   StoreReducerPayload,
 } from "./types";
@@ -104,11 +104,11 @@ export async function __internalDispatch<E extends StoreReducerEvent>(
   return newStore;
 }
 
-export async function access<E extends StoreAccessorEvent>(eventType: E) {
+export async function get<E extends StoreGetterEvent>(eventType: E) {
   const currentStore = await getStore();
-  if (!accessors[eventType]) {
-    console.error("No accessor found for event type", eventType);
+  if (!getters[eventType]) {
+    console.error("No getter found for event type", eventType);
     return null;
   }
-  return accessors[eventType](currentStore);
+  return getters[eventType](currentStore);
 }

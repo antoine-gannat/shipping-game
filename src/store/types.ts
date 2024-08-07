@@ -1,3 +1,4 @@
+import { IDbJourney, IDbPort } from "../database/types";
 import { IDialog } from "../react/types";
 import type {
   CellType,
@@ -49,17 +50,22 @@ export type StoreReducer<E extends StoreReducerEvent> = (
   payload: StoreReducerPayload[E]
 ) => Promise<IStore> | IStore;
 
-// Accessors
+// Getters
 
-export type StoreAccessorEvent = "getIsNewPlayer";
+export type StoreGetterEvent =
+  | "getIsNewPlayer"
+  | "getActiveJourneys"
+  | "getPorts";
 
-export type StoreAccessorPayload = {
+export type StoreGetterPayload = {
   getIsNewPlayer: boolean;
+  getActiveJourneys: IDbJourney[];
+  getPorts: IDbPort[];
 };
 
-export type StoreAccessor<E extends StoreAccessorEvent> = (
+export type StoreGetter<E extends StoreGetterEvent> = (
   store: IStore
-) => Promise<StoreAccessorPayload[E]>;
+) => Promise<StoreGetterPayload[E]>;
 
 // --- Scenes --- //
 
