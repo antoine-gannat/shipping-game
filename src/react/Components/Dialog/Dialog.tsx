@@ -54,23 +54,7 @@ export function Dialog({
   const lastClickPosRef = React.useRef<{ x: number; y: number }>();
   const initalClickOffset = React.useRef<{ x: number; y: number }>();
 
-  const onMouseDown = React.useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      lastClickPosRef.current = { x: e.clientX, y: e.clientY };
-      initalClickOffset.current = {
-        x: e.clientX - positionState.x,
-        y: e.clientY - positionState.y,
-      };
-    },
-    [positionState]
-  );
-
-  const onMouseUp = React.useCallback(() => {
-    lastClickPosRef.current = undefined;
-    initalClickOffset.current = undefined;
-  }, []);
-  const onMouseMove = React.useCallback((e: React.MouseEvent) => {
+  const onMouseMove = React.useCallback((e: MouseEvent) => {
     if (!lastClickPosRef.current || !initalClickOffset.current) {
       return;
     }
@@ -81,13 +65,41 @@ export function Dialog({
     lastClickPosRef.current = { x: e.clientX, y: e.clientY };
   }, []);
 
+  const onMouseUp = React.useCallback(() => {
+    lastClickPosRef.current = undefined;
+    initalClickOffset.current = undefined;
+    document.body.removeEventListener("mouseup", onMouseUp);
+    document.body.removeEventListener("mousemove", onMouseMove);
+  }, []);
+
+  const onMouseDown = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      // Add listeners to the body to handle mouse up and move.
+      // If we add these to the component, we would lose the mouse up event
+      // if the mouse is moved out of the component.
+      document.body.addEventListener("mouseup", onMouseUp);
+      document.body.addEventListener("mousemove", onMouseMove);
+      lastClickPosRef.current = { x: e.clientX, y: e.clientY };
+      initalClickOffset.current = {
+        x: e.clientX - positionState.x,
+        y: e.clientY - positionState.y,
+      };
+    },
+    [positionState]
+  );
+
   return (
     <Window
-      style={{ left: positionState.x, top: positionState.y, cursor: "move" }}
+      style={{
+        left: positionState.x,
+        top: positionState.y,
+        cursor: "move",
+        position: "absolute",
+      }}
       title={title}
       onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onMouseMove={onMouseMove}
       onClear={() => dispatch("removeDialog", { dialogId: id })}
     >
       {content.map((c) => {
