@@ -16,6 +16,7 @@ const useStyles = createUseStyles({
     position: "absolute",
     zIndex: 10,
     backgroundColor: "transparent",
+    fontFamily: "Segoe UI",
   },
 });
 
@@ -45,7 +46,7 @@ export function App() {
       {/* Navbar */}
       <Navbar {...baseProps} />
       {store.dialogs.map((dialog) => (
-        <Dialog key={dialog.title} dialog={dialog as IDialog} />
+        <Dialog key={dialog.title} {...(dialog as IDialog)} />
       ))}
       <Events {...baseProps} />
     </div>

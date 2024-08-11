@@ -37,9 +37,8 @@ export class Cell {
     const height = CELL_SIZE / 2;
     const sidePosition = { x: 0, y: CELL_SIZE / 2 };
 
-    topSide.beginFill(color);
-    topSide.drawRect(0, 0, size, size);
-    topSide.endFill();
+    topSide.rect(0, 0, size, size);
+    topSide.fill({ color });
     topSide.position = sidePosition;
     topSide.skew = {
       x: degToRad(60 /* degrees */),
@@ -50,9 +49,8 @@ export class Cell {
     if (!hasLeftNeighbor || doubleSize) {
       leftSide = new Graphics();
 
-      leftSide.beginFill(shadeColor(color, -20));
-      leftSide.drawRect(0, 0, height, size);
-      leftSide.endFill();
+      leftSide.rect(0, 0, height, size);
+      leftSide.fill({ color: shadeColor(color, -20) });
       leftSide.position = sidePosition;
       leftSide.skew = {
         x: degToRad(60 /* degrees */),
@@ -63,9 +61,8 @@ export class Cell {
     let rightSide: Graphics;
     if (!hasRightNeighbor || doubleSize) {
       rightSide = new Graphics();
-      rightSide.beginFill(shadeColor(color, -30));
-      rightSide.drawRect(0, 0, size, height);
-      rightSide.endFill();
+      rightSide.rect(0, 0, size, height);
+      rightSide.fill({ color: shadeColor(color, -30) });
       rightSide.position = {
         x: size * MAGIC_X_POSITION_MULTIPLIER, // TODO: magic number
         y: doubleSize ? size - CELL_SIZE / 2 : size,

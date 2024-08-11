@@ -1,8 +1,8 @@
 import React from "react";
 import { IBaseProps } from "../../types";
-import { useStyles } from "./Events.styles";
 import { get } from "../../../store";
 import { IDbJourney } from "../../../database/types";
+import { Window } from "../Window/Window";
 
 interface IJourney extends IDbJourney {
   originPortName: string;
@@ -13,7 +13,6 @@ const valToPercent = (val: number, max: number) => (val / max) * 100;
 
 export function Events({}: IBaseProps): React.ReactElement {
   const [journeys, setJourneys] = React.useState<IJourney[]>([]);
-  const styles = useStyles();
   React.useEffect(() => {
     const interval = setInterval(() => {
       Promise.all([get("getActiveJourneys"), get("getPorts")]).then(
@@ -35,7 +34,7 @@ export function Events({}: IBaseProps): React.ReactElement {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <Window title="Events">
       {journeys.map((journey) => (
         <div key={journey.id}>
           {journey.originPortName}
@@ -49,6 +48,6 @@ export function Events({}: IBaseProps): React.ReactElement {
           {journey.destinationPortName}
         </div>
       ))}
-    </div>
+    </Window>
   );
 }
