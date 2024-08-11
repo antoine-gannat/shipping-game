@@ -3,8 +3,6 @@ import { createUseStyles } from "react-jss";
 export const useStyles = createUseStyles({
   root: {
     color: "white",
-    width: "auto",
-    position: "absolute",
     zIndex: 11,
     backgroundColor: "grey",
     userSelect: "none",

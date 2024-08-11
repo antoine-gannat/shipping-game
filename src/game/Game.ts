@@ -91,6 +91,10 @@ class Game {
   }
 
   private onWheel(event: WheelEvent) {
+    // if we are scrolling elsewhere, ignore
+    if (event.target !== app.canvas) {
+      return;
+    }
     if (event.deltaY > 0) {
       app.stage.scale.x -= 0.1;
       app.stage.scale.y -= 0.1;

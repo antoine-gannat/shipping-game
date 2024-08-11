@@ -18,7 +18,7 @@ export function Window({
 }: React.PropsWithChildren<IWindowProps>): React.ReactElement {
   const styles = useStyles();
   return (
-    <div {...rest} className={styles.root}>
+    <div {...rest} className={[styles.root, rest.className].join(" ")}>
       <div className={styles.heading}>
         <span>{title}</span>
 
