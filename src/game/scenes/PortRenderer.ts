@@ -31,7 +31,7 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
 
     // Draw map
     scene.cells.forEach((rowOfCells, row) => {
-      rowOfCells.forEach((cellType, column) => {
+      rowOfCells.forEach(async (cellType, column) => {
         const cellInfo = scene.cellsInfo[cellType as CellType];
         if (!cellInfo || !cellInfo.cellColor) {
           return;
@@ -63,7 +63,10 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
 
         // if that cell also has an asset, render it
         if (cellInfo.asset) {
-          const sprite = PIXI.Sprite.from(`./assets/${cellInfo.asset}.png`);
+          const texture = await PIXI.Assets.load(
+            `./assets/${cellInfo.asset}.png`
+          );
+          const sprite = PIXI.Sprite.from(texture);
           const scaleDownAmount = CELL_SIZE / cellInfo.size;
           sprite.scale.set(scaleDownAmount);
 

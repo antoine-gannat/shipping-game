@@ -15,20 +15,24 @@ export function Ports({}: IBaseProps): React.ReactElement {
   return (
     <Window title="Ports" className={styles.container}>
       <table>
-        <tr>
-          <th>Country</th>
-          <th>Ships</th>
-        </tr>
-        {ownedPorts?.map((port) => (
-          <tr
-            className={styles.listElement}
-            key={port.id}
-            onClick={() => dispatch("visitPort", { portName: port.name })}
-          >
-            <td>{port.name}</td>
-            <td>{port.ships.length}</td>
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th>Ships</th>
           </tr>
-        ))}
+        </thead>
+        <tbody>
+          {ownedPorts?.map((port) => (
+            <tr
+              className={styles.listElement}
+              key={port.id}
+              onClick={() => dispatch("visitPort", { portName: port.name })}
+            >
+              <td>{port.name}</td>
+              <td>{port.ships.length}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </Window>
   );

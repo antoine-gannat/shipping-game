@@ -2,7 +2,7 @@ import { app } from "../Pixi";
 import { CAMERA_MAX_SCALE, CAMERA_MIN_SCALE } from "./constants";
 import { IPosition } from "../types";
 import { subscribe } from "../store";
-import { IStore } from "../store/types";
+import { IPortScene, IStore } from "../store/types";
 import { renderScene } from "./scenes";
 
 class Game {
@@ -19,7 +19,13 @@ class Game {
     window.addEventListener("mouseout", this.onMouseUp.bind(this));
 
     subscribe((prevStore, newStore) => {
-      if (prevStore?.scene.kind === newStore.scene.kind) {
+      const prevScene = prevStore?.scene;
+      const newScene = newStore.scene;
+      if (
+        prevScene?.kind === newScene?.kind &&
+        (prevScene as IPortScene)?.portName ===
+          (newScene as IPortScene)?.portName
+      ) {
         // only re-render if we change scene
         return;
       }
