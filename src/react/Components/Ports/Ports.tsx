@@ -4,6 +4,7 @@ import { Window } from "../Window/Window";
 import { useStyles } from "./Ports.styles";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../../database";
+import { dispatch } from "../../../store";
 
 export function Ports({}: IBaseProps): React.ReactElement {
   const ownedPorts = useLiveQuery(() =>
@@ -13,11 +14,22 @@ export function Ports({}: IBaseProps): React.ReactElement {
 
   return (
     <Window title="Ports" className={styles.container}>
-      <ul>
+      <table>
+        <tr>
+          <th>Country</th>
+          <th>Ships</th>
+        </tr>
         {ownedPorts?.map((port) => (
-          <li key={port.id}>{port.name}</li>
+          <tr
+            className={styles.listElement}
+            key={port.id}
+            onClick={() => dispatch("visitPort", { portName: port.name })}
+          >
+            <td>{port.name}</td>
+            <td>{port.ships.length}</td>
+          </tr>
         ))}
-      </ul>
+      </table>
     </Window>
   );
 }
