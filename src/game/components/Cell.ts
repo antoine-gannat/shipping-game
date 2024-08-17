@@ -1,12 +1,10 @@
-import { Container, Graphics } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { CellType, DeepReadonly, ICellInfo, IPosition } from "../../types";
-import { CELL_SIZE, MAGIC_X_POSITION_MULTIPLIER } from "../constants";
+import { CELL_SIZE } from "../constants";
 import { shadeColor } from "../utils/shadeColor";
-import { degToRad } from "../utils/degrees";
-import { cellPositionToScreenPosition } from "../utils/cellPosition";
 
 export class Cell {
-  public element: Container;
+  public element: Graphics;
   public bounds: {
     top: IPosition;
     left: IPosition;
@@ -18,63 +16,43 @@ export class Cell {
     pos: IPosition,
     color: string,
     // used to calculate neighbors
-    cells: DeepReadonly<CellType[][]>,
-    cellsInfo: DeepReadonly<Record<CellType, ICellInfo>>,
-    doubleSize = false
+    _cells: DeepReadonly<CellType[][]>,
+    _cellsInfo: DeepReadonly<Record<CellType, ICellInfo>>,
+    _doubleSize = false
   ) {
-    const position = doubleSize ? { x: pos.x, y: pos.y + 1 } : pos;
-    const size = doubleSize ? CELL_SIZE * 2 : CELL_SIZE;
-    this.element = new Container();
-    // calculate if the cell has neighbors, if not, we'll render the sides
+    // const position = doubleSize ? { x: pos.x, y: pos.y + 1 } : pos;
+    // const size = doubleSize ? CELL_SIZE * 2 : CELL_SIZE;
+    this.element = new Graphics();
 
-    // We concider the cell has a neighbor if said cell has a color
-    const hasLeftNeighbor =
-      !!cellsInfo[cells[position.y + 1]?.[position.x]]?.cellColor;
-    const hasRightNeighbor =
-      !!cellsInfo[cells[position.y]?.[position.x + 1]]?.cellColor;
-
-    const topSide = new Graphics();
-    const height = CELL_SIZE / 2;
-    const sidePosition = { x: 0, y: CELL_SIZE / 2 };
-
-    topSide.rect(0, 0, size, size);
-    topSide.fill({ color });
-    topSide.position = sidePosition;
-    topSide.skew = {
-      x: degToRad(60 /* degrees */),
-      y: -degToRad(30 /* degrees */),
+    this.element.position.set(
+      (CELL_SIZE / 2) * pos.x - (CELL_SIZE / 2) * pos.y,
+      pos.x * (CELL_SIZE / 4) + pos.y * (CELL_SIZE / 4)
+    );
+    const pts = {
+      x1: CELL_SIZE / 2,
+      y1: 0,
+      x2: CELL_SIZE,
+      y2: CELL_SIZE / 4,
+      x3: CELL_SIZE / 2,
+      y3: CELL_SIZE / 2,
+      x4: 0,
+      y4: CELL_SIZE / 4,
     };
 
-    let leftSide: Graphics;
-    if (!hasLeftNeighbor || doubleSize) {
-      leftSide = new Graphics();
+    const topColor = color;
+    const leftColor = shadeColor(color, -20);
+    const rightColor = shadeColor(color, -30);
 
-      leftSide.rect(0, 0, height, size);
-      leftSide.fill({ color: shadeColor(color, -20) });
-      leftSide.position = sidePosition;
-      leftSide.skew = {
-        x: degToRad(60 /* degrees */),
-        y: degToRad(90 /* degrees */),
-      };
-    }
-
-    let rightSide: Graphics;
-    if (!hasRightNeighbor || doubleSize) {
-      rightSide = new Graphics();
-      rightSide.rect(0, 0, size, height);
-      rightSide.fill({ color: shadeColor(color, -30) });
-      rightSide.position = {
-        x: size * MAGIC_X_POSITION_MULTIPLIER, // TODO: magic number
-        y: doubleSize ? size - CELL_SIZE / 2 : size,
-      };
-      rightSide.skew = { x: 0, y: -degToRad(30 /* degrees */) };
-    }
-
-    const { x, y } = cellPositionToScreenPosition(position);
-    this.element.position.set(x, y);
-
-    leftSide && this.element.addChild(leftSide);
-    rightSide && this.element.addChild(rightSide);
-    this.element.addChild(topSide);
+    // prettier-ignore
+    this.element.svg(`
+      <svg width="${CELL_SIZE}" height="${CELL_SIZE}">
+        <-- topSide -->
+        <path d="M ${pts.x1} ${pts.y1} L ${pts.x2} ${pts.y2} L ${pts.x3} ${pts.y3} L ${pts.x4} ${pts.y4}" fill="${topColor}" stroke="${topColor}" />
+        <-- leftSide -->
+        <path d="M ${pts.x4} ${pts.y4} L ${pts.x4} ${pts.y4 + CELL_SIZE / 2} L ${pts.x1} ${pts.y3 + CELL_SIZE/2} L ${pts.x3} ${pts.y3}" fill="${leftColor}" stroke="${leftColor}" />
+        <-- rightSide -->
+        <path d="M ${pts.x2} ${pts.y2} L ${pts.x2} ${pts.y2 + CELL_SIZE / 2} L ${pts.x1} ${pts.y3 + CELL_SIZE/2} L ${pts.x3} ${pts.y3}" fill="${rightColor}" stroke="${rightColor}" />
+      </svg>
+     `);
   }
 }
