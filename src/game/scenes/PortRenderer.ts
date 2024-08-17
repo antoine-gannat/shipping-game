@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { app } from "../../Pixi";
 import { IPortScene } from "../../store/types";
-import { CellType, DeepReadonly, IPosition, IShip } from "../../types";
+import { CellType, DeepReadonly, IShip } from "../../types";
 import { ISceneRenderer } from "../types";
 import { CELL_SIZE } from "../constants";
 import { cellPositionToScreenPosition } from "../utils/cellPosition";
@@ -27,7 +27,7 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
       });
     });
 
-    const canBeMergedCells = this.getCellsThatCanMerge(scene);
+    // const canBeMergedCells = this.getCellsThatCanMerge(scene);
 
     // Draw map
     scene.cells.forEach((rowOfCells, row) => {
@@ -36,29 +36,23 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
         if (!cellInfo || !cellInfo.cellColor) {
           return;
         }
-        const shouldRenderMergedCell = canBeMergedCells.some(
-          (position) => position.x === column && position.y === row
-        );
-        const wasCurrentCellMerged = canBeMergedCells.some(
-          (position) =>
-            (position.x === column - 1 && position.y === row - 1) ||
-            (position.x === column && position.y === row - 1) ||
-            (position.x === column - 1 && position.y === row)
-        );
-        if (wasCurrentCellMerged) {
-          return;
-        }
+        // const shouldRenderMergedCell = canBeMergedCells.some(
+        //   (position) => position.x === column && position.y === row
+        // );
+        // const wasCurrentCellMerged = canBeMergedCells.some(
+        //   (position) =>
+        //     (position.x === column - 1 && position.y === row - 1) ||
+        //     (position.x === column && position.y === row - 1) ||
+        //     (position.x === column - 1 && position.y === row)
+        // );
+        // if (wasCurrentCellMerged) {
+        //   return;
+        // }
         const position = {
           x: column,
           y: row,
         };
-        const cell = new Cell(
-          position,
-          cellInfo.cellColor,
-          scene.cells,
-          scene.cellsInfo,
-          shouldRenderMergedCell
-        );
+        const cell = new Cell(position, cellInfo.cellColor);
         app.stage.addChild(cell.element);
 
         // if that cell also has an asset, render it
@@ -86,30 +80,30 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
     });
   }
 
-  // To improve performances, merge 4 cells into one
-  private getCellsThatCanMerge(scene: DeepReadonly<IPortScene>): IPosition[] {
-    const canBeMergedCells: IPosition[] = [];
+  // // To improve performances, merge 4 cells into one
+  // private getCellsThatCanMerge(scene: DeepReadonly<IPortScene>): IPosition[] {
+  //   const canBeMergedCells: IPosition[] = [];
 
-    for (let row = 0; row < scene.cells.length; row += 2) {
-      for (let column = 0; column < scene.cells[row].length; column += 2) {
-        const topLeftCell = scene.cells[row][column];
-        const topRightCell = scene.cells[row][column + 1];
-        const bottomLeftCell =
-          scene.cells[row + 1] && scene.cells[row + 1][column];
-        const bottomRightCell =
-          scene.cells[row + 1] && scene.cells[row + 1][column + 1];
+  //   for (let row = 0; row < scene.cells.length; row += 2) {
+  //     for (let column = 0; column < scene.cells[row].length; column += 2) {
+  //       const topLeftCell = scene.cells[row][column];
+  //       const topRightCell = scene.cells[row][column + 1];
+  //       const bottomLeftCell =
+  //         scene.cells[row + 1] && scene.cells[row + 1][column];
+  //       const bottomRightCell =
+  //         scene.cells[row + 1] && scene.cells[row + 1][column + 1];
 
-        if (
-          topLeftCell === topRightCell &&
-          topRightCell === bottomLeftCell &&
-          bottomLeftCell === bottomRightCell
-        ) {
-          canBeMergedCells.push({ x: column, y: row });
-        }
-      }
-    }
-    return canBeMergedCells;
-  }
+  //       if (
+  //         topLeftCell === topRightCell &&
+  //         topRightCell === bottomLeftCell &&
+  //         bottomLeftCell === bottomRightCell
+  //       ) {
+  //         canBeMergedCells.push({ x: column, y: row });
+  //       }
+  //     }
+  //   }
+  //   return canBeMergedCells;
+  // }
 
   private async drawShip(ship: IShip): Promise<PIXI.AnimatedSprite> {
     const frames = this.createFramesForAnimation(
