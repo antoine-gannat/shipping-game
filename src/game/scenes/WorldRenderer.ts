@@ -8,11 +8,7 @@ import { ISceneRenderer } from "../types";
 import { addHoverStyling } from "../utils/addHoverStyling";
 
 export class WorldRenderer implements ISceneRenderer<IWorldScene> {
-  constructor() {}
-
   public render(scene: DeepReadonly<IWorldScene>) {
-    // const canBeMergedCells = this.getCellsThatCanMerge(scene);
-
     // Draw map
     scene.cells.forEach((rowOfCells, row) => {
       rowOfCells.forEach((cellType, column) => {
@@ -21,18 +17,6 @@ export class WorldRenderer implements ISceneRenderer<IWorldScene> {
         if (!cellInfo || !cellInfo.cellColor) {
           return;
         }
-        // const shouldRenderMergedCell = canBeMergedCells.some(
-        //   (position) => position.x === column && position.y === row
-        // );
-        // const wasCurrentCellMerged = canBeMergedCells.some(
-        //   (position) =>
-        //     (position.x === column - 1 && position.y === row - 1) ||
-        //     (position.x === column && position.y === row - 1) ||
-        //     (position.x === column - 1 && position.y === row)
-        // );
-        // if (wasCurrentCellMerged) {
-        //   return;
-        // }
         const cell = new Cell(position, cellInfo.cellColor);
         app.stage.addChild(cell.element);
 
@@ -56,29 +40,4 @@ export class WorldRenderer implements ISceneRenderer<IWorldScene> {
       });
     });
   }
-
-  // To improve performances, merge 4 cells into one
-  // private getCellsThatCanMerge(scene: DeepReadonly<IWorldScene>): IPosition[] {
-  //   const canBeMergedCells: IPosition[] = [];
-
-  //   for (let row = 0; row < scene.cells.length; row += 2) {
-  //     for (let column = 0; column < scene.cells[row].length; column += 2) {
-  //       const topLeftCell = scene.cells[row][column];
-  //       const topRightCell = scene.cells[row][column + 1];
-  //       const bottomLeftCell =
-  //         scene.cells[row + 1] && scene.cells[row + 1][column];
-  //       const bottomRightCell =
-  //         scene.cells[row + 1] && scene.cells[row + 1][column + 1];
-
-  //       if (
-  //         topLeftCell === topRightCell &&
-  //         topRightCell === bottomLeftCell &&
-  //         bottomLeftCell === bottomRightCell
-  //       ) {
-  //         canBeMergedCells.push({ x: column, y: row });
-  //       }
-  //     }
-  //   }
-  //   return canBeMergedCells;
-  // }
 }
