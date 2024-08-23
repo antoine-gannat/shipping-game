@@ -7,6 +7,7 @@ import { CellType, DeepReadonly } from "../../types";
 import { Cell } from "../components/Cell";
 import { ISceneRenderer } from "../types";
 import { addHoverStyling } from "../utils/addHoverStyling";
+import { Isometry } from "../utils/isometry";
 
 export class WorldRenderer implements ISceneRenderer<IWorldScene> {
   public render(scene: DeepReadonly<IWorldScene>) {
@@ -15,12 +16,9 @@ export class WorldRenderer implements ISceneRenderer<IWorldScene> {
       const cellInfo = scene.cellsInfo[cellTypeNumber];
       const paths = worldCellsPosition[
         cellType as keyof typeof worldCellsPosition
-      ].map((position) => Cell.createPaths(position));
+      ].map((position) => Isometry.createPaths(position, cellInfo.cellColor));
       const graphics = new Graphics();
-      graphics.svg(`
-        <svg>
-        ${paths.join("")}
-        </svg>`);
+      graphics.svg(`<svg>${paths.join("")}</svg>`);
       cellInfo.isInteractive &&
         this.addCellInteractivity(
           { element: graphics } as Cell,
