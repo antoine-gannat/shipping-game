@@ -6,8 +6,10 @@ import { Isometry } from "../utils/isometry";
 export class Cell {
   public element: Graphics;
 
-  constructor(pos: IPosition, color: string, size: number = CELL_SIZE) {
+  constructor(pos: IPosition, color: string) {
     this.element = new Graphics();
+
+    const size = { width: CELL_SIZE, height: CELL_SIZE / 4 };
 
     const screenPos = Isometry.gridPosToIsometricScreenPos(pos, size);
     this.element.position.set(screenPos.x, screenPos.y);

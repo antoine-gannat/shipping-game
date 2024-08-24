@@ -3,6 +3,8 @@ import { CELL_SIZE } from "../constants";
 import { shadeColor } from "./shadeColor";
 
 type Svg = string;
+type Size = { width: number; height: number };
+
 const svgCache: Record<string, string> = {};
 
 /**
@@ -12,13 +14,13 @@ export class Isometry {
   /**
    * Create an SVG of a cube with a given size and color.
    */
-  public static createCube(size: number, color: string): Svg {
+  public static createCube(size: Size, color: string): Svg {
     const cacheKey = `${size}-${color}`;
     // if we have it in cache, return it
     if (svgCache[cacheKey]) return svgCache[cacheKey];
 
     // create a single cube, position 0,0
-    const paths = Isometry.createPaths({ x: 0, y: 0 }, color);
+    const paths = Isometry.createPaths({ x: 0, y: 0 }, color, size);
     const newSvg = `<svg width="${size}" height="${size}">${paths}</svg>`;
 
     // cache it and return
@@ -29,7 +31,11 @@ export class Isometry {
   /**
    * Create the SVG paths for an isometric cube.
    */
-  public static createPaths(pos: IPosition, color: string, size = CELL_SIZE) {
+  public static createPaths(
+    pos: IPosition,
+    color: string,
+    size: Size = { width: CELL_SIZE, height: CELL_SIZE }
+  ) {
     // convert the grid position to the isometric screen position
     const isometricPosition = Isometry.gridPosToIsometricScreenPos(pos, size);
     // get the points of the isometric shape
@@ -57,11 +63,12 @@ export class Isometry {
    */
   public static gridPosToIsometricScreenPos(
     pos: IPosition,
-    size: number
+    { width }: Size
   ): IPosition {
+    // Only use the width to calculate position, as height does not matter here.
     return {
-      x: (size / 2) * pos.x - (size / 2) * pos.y,
-      y: pos.x * (size / 4) + pos.y * (size / 4),
+      x: (width / 2) * pos.x - (width / 2) * pos.y,
+      y: pos.x * (width / 4) + pos.y * (width / 4),
     };
   }
 
@@ -77,23 +84,23 @@ export class Isometry {
   /**
    * Get the bounding points of each face of an isometric cube from a position and size.
    */
-  public static getFacesPoints({ x, y }: IPosition, size: number) {
+  public static getFacesPoints({ x, y }: IPosition, { width, height }: Size) {
     const topFace = [
       {
-        x: size / 2 + x,
+        x: width / 2 + x,
         y: 0 + y,
       },
       {
-        x: size + x,
-        y: size / 4 + y,
+        x: width + x,
+        y: width / 4 + y, // using width on purpose, as height shouldn't be used for the top face
       },
       {
-        x: size / 2 + x,
-        y: size / 2 + y,
+        x: width / 2 + x,
+        y: width / 2 + y, // using width on purpose, as height shouldn't be used for the top face
       },
       {
         x: 0 + x,
-        y: size / 4 + y,
+        y: width / 4 + y, // using width on purpose, as height shouldn't be used for the top face
       },
     ];
     const leftFace = [
@@ -103,11 +110,11 @@ export class Isometry {
       },
       {
         x: topFace[3].x,
-        y: topFace[3].y + size / 2,
+        y: topFace[3].y + height,
       },
       {
         x: topFace[0].x,
-        y: topFace[2].y + size / 2,
+        y: topFace[2].y + height,
       },
       {
         x: topFace[2].x,
@@ -121,11 +128,11 @@ export class Isometry {
       },
       {
         x: topFace[1].x,
-        y: topFace[1].y + size / 2,
+        y: topFace[1].y + height,
       },
       {
         x: topFace[0].x,
-        y: topFace[2].y + size / 2,
+        y: topFace[2].y + height,
       },
       {
         x: topFace[2].x,

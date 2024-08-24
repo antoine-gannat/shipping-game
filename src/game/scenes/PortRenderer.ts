@@ -52,10 +52,10 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
            * Center the sprite on the cell. Since sprites are only rendered on the top face,
            * we need to move it up by half the cell size to center it.
            */
-          const { x, y } = Isometry.gridPosToIsometricScreenPos(
-            position,
-            CELL_SIZE
-          );
+          const { x, y } = Isometry.gridPosToIsometricScreenPos(position, {
+            width: CELL_SIZE,
+            height: CELL_SIZE,
+          });
           sprite.position.set(x, y - CELL_SIZE / 2);
 
           if (cellInfo.isInteractive) {
@@ -110,7 +110,10 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
     // play the animation on a loop
     shipAnimation.play();
 
-    const pos = Isometry.gridPosToIsometricScreenPos(ship.position, CELL_SIZE);
+    const pos = Isometry.gridPosToIsometricScreenPos(ship.position, {
+      width: CELL_SIZE,
+      height: CELL_SIZE,
+    });
     shipAnimation.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
     if (ship.static) {
