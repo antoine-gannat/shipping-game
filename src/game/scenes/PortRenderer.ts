@@ -4,10 +4,10 @@ import { IPortScene } from "../../store/types";
 import { CellType, DeepReadonly, IShip } from "../../types";
 import { ISceneRenderer } from "../types";
 import { CELL_SIZE } from "../constants";
-import { cellPositionToScreenPosition } from "../utils/cellPosition";
 import { addHoverStyling } from "../utils/addHoverStyling";
 import { dispatch } from "../../store";
 import { Cell } from "../components/Cell";
+import { Isometry } from "../utils/isometry";
 
 export class PortRenderer implements ISceneRenderer<IPortScene> {
   public render(scene: DeepReadonly<IPortScene>) {
@@ -48,8 +48,15 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
           const scaleDownAmount = CELL_SIZE / cellInfo.size;
           sprite.scale.set(scaleDownAmount);
 
-          const { x, y } = cellPositionToScreenPosition(position);
-          sprite.position.set(x + CELL_SIZE * 0.365, y); // magic
+          /**
+           * Center the sprite on the cell. Since sprites are only rendered on the top face,
+           * we need to move it up by half the cell size to center it.
+           */
+          const { x, y } = Isometry.gridPosToIsometricScreenPos(
+            position,
+            CELL_SIZE
+          );
+          sprite.position.set(x, y - CELL_SIZE / 2);
 
           if (cellInfo.isInteractive) {
             addHoverStyling(sprite, 0.9);
@@ -103,7 +110,7 @@ export class PortRenderer implements ISceneRenderer<IPortScene> {
     // play the animation on a loop
     shipAnimation.play();
 
-    const pos = cellPositionToScreenPosition(ship.position);
+    const pos = Isometry.gridPosToIsometricScreenPos(ship.position, CELL_SIZE);
     shipAnimation.position.set(pos.x + CELL_SIZE * 0.365, pos.y);
 
     if (ship.static) {

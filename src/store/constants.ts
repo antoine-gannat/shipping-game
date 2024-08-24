@@ -1,10 +1,10 @@
 import { CellType } from "../types";
 
 export const PORT_A_CELLS: CellType[][] = [
-  [1, 1, 1, 1, 1, 2, 2],
+  [1, 1, 1, 1, 2, 1, 2],
   [0, 1, 1, 1, 0, 0, 0],
-  [0, 1, 1, 1, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 0],
+  [0, 1, 1, 1, 0, 0, 4],
+  [0, 1, 1, 1, 1, 0, 0],
   [0, 1, 1, 1, 1, 3, 0],
   [0, 1, 0, 0, 1, 3, 0],
   [0, 1, 0, 0, 0, 0, 0],
@@ -34,6 +34,13 @@ export const PORT_A_CELLS_INFO = {
     // containers
     size: 200,
     asset: "containers",
+    cellColor: "#FFFFFF",
+    isInteractive: true,
+  },
+  4: {
+    // containers 2
+    size: 1000,
+    asset: "container2",
     cellColor: "#FFFFFF",
     isInteractive: true,
   },

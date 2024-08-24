@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IStore } from "../store/types";
-import { get, subscribe } from "../store";
+import { dispatch, get, subscribe } from "../store";
 import { Navbar } from "./Components/Navbar/Navbar";
 import { IBaseProps, IDialog } from "./types";
 import { Dialog } from "./Components/Dialog/Dialog";
@@ -16,6 +16,9 @@ export function App() {
 
   React.useEffect(() => {
     get("getIsNewPlayer").then(setIsNewPlayer);
+
+    // get to a port automatically, TODO: remove
+    dispatch("visitPort", { portName: "Canada" });
 
     // listen for store changes and return cleanup fct
     return subscribe((_, newStore) => setStore(newStore));
