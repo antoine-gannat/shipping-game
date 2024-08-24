@@ -15,13 +15,13 @@ export class Isometry {
    * Create an SVG of a cube with a given size and color.
    */
   public static createCube(size: Size, color: string): Svg {
-    const cacheKey = `${size}-${color}`;
+    const cacheKey = `${size.width}-${size.height}-${color}`;
     // if we have it in cache, return it
     if (svgCache[cacheKey]) return svgCache[cacheKey];
 
     // create a single cube, position 0,0
     const paths = Isometry.createPaths({ x: 0, y: 0 }, color, size);
-    const newSvg = `<svg width="${size}" height="${size}">${paths}</svg>`;
+    const newSvg = `<svg width="${size.width}" height="${size.height}">${paths}</svg>`;
 
     // cache it and return
     svgCache[cacheKey] = newSvg;
@@ -47,10 +47,9 @@ export class Isometry {
     const leftColor = shadeColor(color, -20);
     const rightColor = shadeColor(color, -30);
 
-    const topFace = `<path d="${topFacePath}" fill="${topColor}" stroke="${topColor}" />`;
-    const leftFace = `<path d="${leftFacePath}" fill="${leftColor}" stroke="${leftColor}" />`;
-    const rightFace = `<path d="${rightFacePath}" fill="${rightColor}" stroke="${rightColor}" />`;
-
+    const topFace = `<path d="${topFacePath}" fill="${topColor}" />`;
+    const leftFace = `<path d="${leftFacePath}" fill="${leftColor}" />`;
+    const rightFace = `<path d="${rightFacePath}" fill="${rightColor}" />`;
     // merge the faces
     return `${topFace}${leftFace}${rightFace}`;
   }
